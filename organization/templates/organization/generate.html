@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Crear estructura | JobLab{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container hero-grid">
+        <div class="hero-copy">
+            <span class="eyebrow">Planeacion organizacional asistida</span>
+            <h1>Convierte tu idea en un equipo que tenga sentido.</h1>
+            <p class="hero-lead">
+                Describe la empresa que quieres construir. JobLab propondra areas,
+                relaciones de reporte y vacantes editables para iniciar la conversacion.
+            </p>
+            <ul class="feature-list" aria-label="Beneficios">
+                <li><span aria-hidden="true">01</span> Estructura jerarquica coherente</li>
+                <li><span aria-hidden="true">02</span> Puestos, cantidad y conocimientos</li>
+                <li><span aria-hidden="true">03</span> Rangos salariales identificados como estimaciones</li>
+            </ul>
+        </div>
+
+        <div class="form-panel">
+            <div class="panel-heading">
+                <div>
+                    <p class="overline">Nueva generacion</p>
+                    <h2>Contexto de la empresa</h2>
+                </div>
+                <span class="provider-badge">Proveedor: {{ provider_name }}</span>
+            </div>
+
+            <form method="post" novalidate data-generation-form>
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-error" role="alert">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="form-field{% if form.company_description.errors %} has-error{% endif %}">
+                    <label for="{{ form.company_description.id_for_label }}">
+                        {{ form.company_description.label }}
+                    </label>
+                    {{ form.company_description }}
+                    <div class="field-meta">
+                        <span id="company-description-counter" aria-live="polite">0 / 5000</span>
+                        <span>Minimo 80 caracteres</span>
+                    </div>
+                    {% if form.company_description.errors %}
+                        <div class="field-errors" role="alert">{{ form.company_description.errors }}</div>
+                    {% endif %}
+                    <small id="company-description-help" class="help-text">
+                        {{ form.company_description.help_text }}
+                    </small>
+                </div>
+
+                <button class="button button-primary button-wide" type="submit">
+                    <span data-button-label>Generar estructura</span>
+                    <span class="button-arrow" aria-hidden="true">&rarr;</span>
+                </button>
+                <p class="privacy-note">
+                    No incluyas nombres, documentos, credenciales ni informacion confidencial.
+                </p>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="process-section" aria-labelledby="process-title">
+    <div class="container">
+        <p class="overline">Como funciona</p>
+        <h2 id="process-title">De descripcion a plan en tres pasos</h2>
+        <div class="process-grid">
+            <article><span>1</span><h3>Describe</h3><p>Incluye capacidades, mercado, ubicacion, presupuesto y objetivos.</p></article>
+            <article><span>2</span><h3>Genera</h3><p>La IA propone una jerarquia y vacantes bajo un esquema estricto.</p></article>
+            <article><span>3</span><h3>Revisa</h3><p>El resultado queda como borrador, con supuestos y salarios visibles.</p></article>
+        </div>
+    </div>
+</section>
+{% endblock %}

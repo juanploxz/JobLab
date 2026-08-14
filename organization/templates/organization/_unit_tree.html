@@ -1,0 +1,41 @@
+{% load humanize %}
+<article class="unit-node">
+    <header class="unit-header">
+        <div>
+            <span class="unit-code">{{ unit.code }}</span>
+            <h3>{{ unit.name }}</h3>
+            <p>{{ unit.description }}</p>
+        </div>
+        <span class="vacancy-count">{{ unit.vacancies.all|length }} vacante{{ unit.vacancies.all|length|pluralize }}</span>
+    </header>
+
+    {% if unit.vacancies.all %}
+        <div class="vacancy-grid">
+            {% for vacancy in unit.vacancies.all %}
+                <article class="vacancy-card">
+                    <div class="vacancy-topline">
+                        <span>{{ vacancy.available_positions }} puesto{{ vacancy.available_positions|pluralize }}</span>
+                        <span>{{ vacancy.get_status_display }}</span>
+                    </div>
+                    <h4>{{ vacancy.name }}</h4>
+                    <p>{{ vacancy.description }}</p>
+                    <dl class="vacancy-facts">
+                        <div><dt>Rango estimado</dt><dd>{{ vacancy.currency }} ${{ vacancy.salary_min|floatformat:0|intcomma }} - ${{ vacancy.salary_max|floatformat:0|intcomma }} / {{ vacancy.get_salary_period_display|lower }}</dd></div>
+                        {% if vacancy.reports_to %}<div><dt>Reporta a</dt><dd>{{ vacancy.reports_to }}</dd></div>{% endif %}
+                    </dl>
+                    <div class="knowledge-list" aria-label="Conocimientos requeridos">
+                        {% for item in vacancy.required_knowledge %}<span>{{ item }}</span>{% endfor %}
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if unit.children.all %}
+        <div class="unit-children">
+            {% for child in unit.children.all %}
+                {% include "organization/_unit_tree.html" with unit=child only %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</article>

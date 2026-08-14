@@ -1,0 +1,1 @@
+"""Organization generation application."""

@@ -1,0 +1,38 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="JobLab genera estructuras organizacionales y borradores de vacantes con IA.">
+    <title>{% block title %}JobLab{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'organization/styles.css' %}">
+    <script src="{% static 'organization/app.js' %}" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Saltar al contenido</a>
+    <header class="site-header">
+        <nav class="nav container" aria-label="Navegacion principal">
+            <a class="brand" href="{% url 'organization:generate' %}" aria-label="JobLab, inicio">
+                <span class="brand-mark" aria-hidden="true">JL</span>
+                <span>JobLab</span>
+            </a>
+            <div class="nav-links">
+                <a href="{% url 'organization:generate' %}">Crear estructura</a>
+                <a href="{% url 'organization:history' %}">Historial</a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-content">
+            <p><strong>JobLab</strong> convierte una idea de negocio en un primer plan de equipo.</p>
+            <p>Todo resultado generado por IA requiere revision humana.</p>
+        </div>
+    </footer>
+</body>
+</html>
