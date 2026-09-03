@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.db.models import Sum
 from django.shortcuts import redirect
 from django.views.generic import DetailView, FormView, ListView
 
@@ -7,6 +6,7 @@ from organization.bootstrap import build_generation_service
 from organization.domain.exceptions import GenerationError
 from organization.forms import CompanyDescriptionForm
 from organization.models import OrganizationalPlan
+from organization.services import GetPlanDashboardService
 
 
 class GenerateOrganizationView(FormView):
@@ -40,12 +40,11 @@ class OrganizationalPlanDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["root_units"] = self.object.units.filter(parent__isnull=True)
-        context["department_count"] = self.object.units.count()
-        context["vacancy_count"] = self.object.vacancies.count()
-        context["total_positions"] = (
-            self.object.vacancies.aggregate(total=Sum("available_positions"))["total"] or 0
-        )
+        dashboard = GetPlanDashboardService().execute(self.object)
+        context["root_units"] = dashboard.root_units
+        context["department_count"] = dashboard.metrics.department_count
+        context["vacancy_count"] = dashboard.metrics.vacancy_count
+        context["total_positions"] = dashboard.metrics.total_positions
         return context
 
 

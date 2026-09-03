@@ -59,10 +59,40 @@ class OrganizationResponseParserTests(SimpleTestCase):
         with self.assertRaisesRegex(ProposalParsingError, "departamento inexistente"):
             self.parser.parse(json.dumps(self.payload))
 
+    def test_rejects_unknown_parent_reference(self):
+        self.payload["departments"][1]["parent_code"] = "UNKNOWN"
+
+        with self.assertRaisesRegex(ProposalParsingError, "padre UNKNOWN no existe"):
+            self.parser.parse(json.dumps(self.payload))
+
+    def test_rejects_cycle_outside_the_valid_root(self):
+        self.payload["departments"].extend(
+            [
+                {
+                    "code": "OPERATIONS",
+                    "name": "Operaciones",
+                    "description": (
+                        "Responsable de ejecutar y controlar la operacion de la empresa."
+                    ),
+                    "parent_code": "TECH",
+                }
+            ]
+        )
+        self.payload["departments"][1]["parent_code"] = "OPERATIONS"
+
+        with self.assertRaisesRegex(ProposalParsingError, "contiene un ciclo"):
+            self.parser.parse(json.dumps(self.payload))
+
     def test_rejects_multiple_roots(self):
         self.payload["departments"][1]["parent_code"] = None
 
         with self.assertRaisesRegex(ProposalParsingError, "exactamente un departamento raiz"):
+            self.parser.parse(json.dumps(self.payload))
+
+    def test_rejects_blank_parent_code_as_a_validation_error(self):
+        self.payload["departments"][1]["parent_code"] = "   "
+
+        with self.assertRaisesRegex(ProposalParsingError, "codigo no puede estar vacio"):
             self.parser.parse(json.dumps(self.payload))
 
     def test_rejects_extra_fields(self):

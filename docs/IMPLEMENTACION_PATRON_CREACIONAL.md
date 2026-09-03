@@ -1,5 +1,9 @@
 # Implementacion del Patron Creacional
 
+> Documento complementario. La matriz completa de la Entrega 1, el baseline de
+> dominio, la API REST y la estrategia de escalabilidad se encuentran en la
+> [Wiki tecnica versionada](ENTREGABLE_1.md).
+
 ## 1. Funcionalidad seleccionada
 
 Se implemento el caso de uso critico **generar una estructura organizacional y
@@ -147,9 +151,15 @@ vacancy = (
     .in_department(department)
     .with_name(data.name)
     .with_positions(data.available_positions)
-    .with_salary(data.salary_min, data.salary_max, data.currency)
+    .with_salary(
+        data.salary_min,
+        data.salary_max,
+        data.currency,
+        data.salary_period,
+    )
     .with_description(data.description)
     .requiring(data.required_knowledge)
+    .reporting_to(data.reports_to)
     .build()
 )
 ```
@@ -209,10 +219,12 @@ Casos principales:
 - campos faltantes, rango salarial invalido y departamento incorrecto;
 - seleccion `MOCK/GOOGLE` y valor desconocido;
 - JSON valido, Markdown, campos extra y referencias inexistentes;
-- persistencia completa y rollback ante fallo del proveedor;
+- persistencia completa y rollback ante fallos del proveedor o dentro de la transacción;
 - vista accesible, delegacion al Service y pagina de resultados.
 
-GitHub Actions ejecuta las mismas comprobaciones en cada Pull Request.
+GitHub Actions ejecuta las mismas comprobaciones en cada Pull Request. El
+resultado definitivo debe corresponder al mismo commit publicado en `main` o
+`develop`. La verificación local del entregable completó 55 pruebas.
 
 ## 11. Decisiones y limites
 

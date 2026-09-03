@@ -44,7 +44,7 @@ class VacancyBuilderTests(TestCase):
         )
 
     def test_build_returns_valid_unsaved_vacancy(self):
-        vacancy = self.valid_builder().build()
+        vacancy = self.valid_builder().requiring(["Python", " python ", "Django"]).build()
 
         self.assertIsNone(vacancy.pk)
         self.assertEqual(vacancy.available_positions, 2)
@@ -72,3 +72,23 @@ class VacancyBuilderTests(TestCase):
 
         with self.assertRaisesRegex(DomainValidationError, "no pertenece"):
             self.valid_builder().for_plan(other_plan).build()
+
+    def test_rejects_non_integer_or_excessive_positions(self):
+        with self.assertRaisesRegex(DomainValidationError, "numero entero"):
+            self.valid_builder().with_positions("2").build()
+        with self.assertRaisesRegex(DomainValidationError, "entre 1 y 500"):
+            self.valid_builder().with_positions(501).build()
+
+    def test_rejects_negative_or_non_finite_salary(self):
+        with self.assertRaisesRegex(DomainValidationError, "no puede ser negativo"):
+            self.valid_builder().with_salary(-1, 5000000, "COP").build()
+        with self.assertRaisesRegex(DomainValidationError, "numero finito"):
+            self.valid_builder().with_salary("NaN", 5000000, "COP").build()
+
+    def test_rejects_invalid_knowledge_limits(self):
+        with self.assertRaisesRegex(DomainValidationError, "entre 2 y 120"):
+            self.valid_builder().requiring(["X"]).build()
+        with self.assertRaisesRegex(DomainValidationError, "mas de 20"):
+            self.valid_builder().requiring(
+                [f"Conocimiento {index}" for index in range(21)]
+            ).build()

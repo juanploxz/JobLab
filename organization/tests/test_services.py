@@ -1,8 +1,15 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 
 from organization.domain.exceptions import GenerationError
 from organization.infra.ai.mock_provider import MockOrganizationProvider
-from organization.models import OrganizationalPlan, OrganizationGenerationRequest, Vacancy
+from organization.models import (
+    OrganizationalPlan,
+    OrganizationalUnit,
+    OrganizationGenerationRequest,
+    Vacancy,
+)
 from organization.services import GenerateOrganizationService
 
 
@@ -44,6 +51,24 @@ class GenerateOrganizationServiceTests(TestCase):
         self.assertEqual(request.status, OrganizationGenerationRequest.Status.FAILED)
         self.assertIn("proveedor", request.error_message)
         self.assertFalse(OrganizationalPlan.objects.exists())
+
+    def test_rolls_back_plan_and_units_when_persistence_fails(self):
+        service = GenerateOrganizationService(MockOrganizationProvider())
+
+        with patch(
+            "organization.services.VacancyBuilder.build",
+            side_effect=RuntimeError("Fallo dentro de la persistencia"),
+        ) as build:
+            with self.assertRaises(GenerationError):
+                service.execute(DESCRIPTION)
+
+        build.assert_called_once()
+        request = OrganizationGenerationRequest.objects.get()
+        self.assertEqual(request.status, OrganizationGenerationRequest.Status.FAILED)
+        self.assertIn("Fallo dentro de la persistencia", request.error_message)
+        self.assertFalse(OrganizationalPlan.objects.exists())
+        self.assertFalse(OrganizationalUnit.objects.exists())
+        self.assertFalse(Vacancy.objects.exists())
 
     def test_rejects_short_description_before_creating_request(self):
         service = GenerateOrganizationService(MockOrganizationProvider())

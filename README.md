@@ -1,51 +1,104 @@
 # JobLab
 
-JobLab transforma la descripcion de una empresa en un borrador validado de su
-estructura organizacional y las vacantes necesarias. El proyecto fue construido
-como solucion al taller de patrones creacionales: aplica **Service Layer**,
-**Builder**, **Factory** e **inyeccion de dependencias** en un flujo Django real.
+JobLab convierte la descripción de una empresa en un borrador validado de su
+estructura organizacional y de las vacantes necesarias. La solución combina una
+interfaz web en Django con una API REST versionada en Django REST Framework,
+manteniendo las reglas de negocio dentro del dominio y del Service Layer.
 
-> Los organigramas, puestos y salarios son estimaciones asistidas por IA. Siempre
-> deben revisarse antes de tomar decisiones o publicar una vacante.
+> Los organigramas, puestos y salarios son estimaciones asistidas por IA. Deben
+> revisarse antes de tomar decisiones o publicar una vacante.
+
+## Integrantes
+
+- Juan Pablo Parra El-Masri
+- Isabela Valencia Pino
+- Juan Antonio Buendía Sanchez
+- Joan Stiven Peralta Bedoya
+
+## Documentación de la Entrega 1
+
+- [Wiki técnica versionada](docs/ENTREGABLE_1.md): matriz de rúbrica, avance del
+  dominio, estructura de carpetas, diagramas, contrato REST, Service Layer y
+  estrategia de API Gateway.
+- [Implementación del patrón creacional](docs/IMPLEMENTACION_PATRON_CREACIONAL.md):
+  detalle de Builder, Factory e inyección de dependencias.
+- [Wiki de GitHub](https://github.com/juanploxz/JobLab/wiki): copia publicada para
+  la entrega académica.
 
 ## Funcionalidad
 
-- Formulario accesible para describir sector, producto, objetivos, ubicacion,
-  tamano y capacidad de contratacion.
-- Generacion de una jerarquia empresarial con exactamente una unidad raiz.
-- Vacantes con cantidad de puestos, rango salarial, moneda, periodicidad,
-  descripcion, conocimientos y relacion de reporte.
+- Generación de un plan organizacional desde una descripción empresarial.
+- Jerarquía con exactamente una unidad raíz y relaciones padre-hijo válidas.
+- Vacantes con puestos disponibles, rango salarial, moneda, periodicidad,
+  descripción, conocimientos y relación de reporte.
+- API REST `/api/v1/` con respuestas de entrada y salida explícitas.
+- Códigos HTTP `200`, `201`, `400`, `404`, `409` y `503`, según el resultado.
 - Proveedor `MOCK` determinista para desarrollo y pruebas sin costo.
 - Proveedor `GOOGLE` para Gemini mediante el SDK oficial `google-genai`.
-- Respuesta JSON estructurada, esquema Pydantic estricto y validacion de reglas
-  antes de escribir en la base de datos.
-- Transaccion atomica y trazabilidad de solicitudes completadas o fallidas.
-- Historial local, panel administrativo y 22 pruebas automatizadas.
+- Respuesta estructurada, esquemas Pydantic estrictos y validación por capas.
+- Persistencia transaccional y trazabilidad de solicitudes completadas o fallidas.
+- Historial, panel administrativo e interfaz responsive para la demostración.
 
 ## Arquitectura
 
 ```mermaid
 flowchart LR
-    V["Django FormView"] --> C["bootstrap.py"]
-    C --> F["AIProviderFactory"]
-    F --> M["Mock provider"]
-    F --> G["Google provider"]
-    C --> S["GenerateOrganizationService"]
-    S --> P["Parser + Pydantic"]
-    S --> B["VacancyBuilder"]
-    B --> DB["Django models"]
+    HTML["Interfaz HTML"] --> Services["Service Layer"]
+    REST["DRF /api/v1"] --> Services
+    Services --> Domain["Dominio + VacancyBuilder"]
+    Services --> Models["Modelos Django"]
+    Bootstrap["Composition Root"] --> Factory["AIProviderFactory"]
+    Factory --> Mock["Mock provider"]
+    Factory --> Google["Google provider"]
+    Services --> Port["OrganizationGenerator"]
+    Mock -. implementa .-> Port
+    Google -. implementa .-> Port
+    Models --> DB[("SQLite local / PostgreSQL futuro")]
 ```
 
-La vista maneja HTTP. El punto de composicion selecciona infraestructura. El
-Service ejecuta el caso de uso. El Builder produce cada `Vacancy` valida pero sin
-guardar; solo el Service decide cuando persistir dentro de la transaccion.
+La presentación traduce HTTP. Los servicios orquestan casos de uso y
+transacciones. Los validadores y el Builder aplican reglas reutilizables. La
+infraestructura encapsula los proveedores externos. Los serializers explícitos
+y los DTOs mantienen estable el contrato REST sin exponer modelos completos.
 
-La explicacion completa, diagramas y correspondencia con la rubrica estan en
-[Implementacion del Patron Creacional](docs/IMPLEMENTACION_PATRON_CREACIONAL.md).
+## API REST
 
-## Ejecucion local
+| Método y ruta | Resultado |
+| --- | --- |
+| `GET /api/v1/plans/` | Lista paginada (`page`, `page_size`, máximo 50). |
+| `POST /api/v1/plans/` | Genera un plan. |
+| `GET /api/v1/plans/{id}/` | Obtiene el detalle, las métricas, unidades y vacantes. |
+| `POST /api/v1/plans/{id}/vacancies/` | Crea una vacante mediante `VacancyBuilder`. |
+| `GET /api/v1/plans/{id}/vacancies/{vacancy_id}/` | Obtiene la vacante creada. |
 
-Requiere Python 3.10 o posterior. Django 5.2 soporta Python 3.10-3.14.
+Ejemplo de generación:
+
+```powershell
+$body = @{
+    company_description = "Somos una empresa de software en Medellín que desarrolla soluciones para pequeñas empresas y necesita definir su equipo inicial."
+} | ConvertTo-Json
+
+Invoke-RestMethod `
+    -Method Post `
+    -Uri "http://127.0.0.1:8000/api/v1/plans/" `
+    -ContentType "application/json" `
+    -Body $body
+```
+
+Los errores usan un sobre uniforme:
+
+```json
+{
+  "error": {
+    "code": "plan_not_found",
+    "detail": "No existe un plan organizacional con el id indicado."
+  }
+}
+```
+
+## Ejecución local
+
+Requiere Python 3.10 o posterior.
 
 ### PowerShell
 
@@ -69,13 +122,13 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-Abre <http://127.0.0.1:8000/>. Sin variables adicionales, el proyecto utiliza
+Abre <http://127.0.0.1:8000/>. Sin variables adicionales, el proyecto usa
 `AI_PROVIDER=MOCK` y funciona sin red ni credenciales.
 
 ## Activar Gemini
 
-Nunca guardes la clave en Git. Puedes partir de `.env.example`, pero este proyecto
-lee variables del proceso para evitar una dependencia adicional.
+Nunca guardes la clave en Git. El proyecto lee la configuración del proceso; el
+archivo `.env.example` sirve como referencia.
 
 PowerShell:
 
@@ -95,9 +148,7 @@ set GEMINI_MODEL=gemini-2.5-flash-lite
 python manage.py runserver
 ```
 
-Para volver al modo local cambia `AI_PROVIDER` a `MOCK`.
-
-## Validacion
+## Verificación
 
 ```powershell
 python manage.py makemigrations --check --dry-run
@@ -105,7 +156,7 @@ python manage.py check
 python manage.py test
 ```
 
-Con cobertura opcional:
+Para medir cobertura:
 
 ```powershell
 python -m pip install -r requirements-dev.txt
@@ -113,33 +164,37 @@ coverage run manage.py test
 coverage report
 ```
 
+> Verificación local del entregable: **55 pruebas aprobadas**, migraciones sin
+> cambios pendientes y `manage.py check` sin errores.
+
+GitHub Actions ejecuta las comprobaciones en un entorno limpio. Para que la
+evidencia sea válida, el workflow verde debe corresponder al SHA entregado en
+`main` o `develop`.
+
 ## Estructura principal
 
 ```text
+joblab/                           configuración y rutas globales
 organization/
-|-- bootstrap.py                 # punto de composicion
-|-- services.py                  # caso de uso y transaccion
-|-- domain/
-|   |-- builders.py              # VacancyBuilder fluido
-|   |-- ports.py                 # contrato del proveedor
-|   |-- schemas.py               # esquema y reglas de la propuesta
-|   `-- validators.py            # entrada no confiable
-|-- infra/ai/
-|   |-- factory.py               # seleccion MOCK/GOOGLE
-|   |-- mock_provider.py
-|   |-- google_provider.py
-|   `-- response_parser.py
-|-- templates/                   # formulario, organigrama e historial
-`-- tests/                       # Builder, Factory, parser, Service y vistas
+|-- api/                         APIView, serializers y rutas REST
+|-- domain/                      reglas, schemas, puerto y Builder
+|-- infra/ai/                    Factory, providers y parser
+|-- migrations/                 evolución del esquema
+|-- templates/ y static/        interfaz web
+|-- tests/                       pruebas unitarias y de integración
+|-- dtos.py                      comandos y resultados neutrales a HTTP
+|-- models.py                    entidades y restricciones persistentes
+`-- services.py                  casos de uso y transacciones
+docs/                             documentación y fuente de la Wiki
+.github/workflows/               validación continua
 ```
 
-## Seguridad y limites
+## Seguridad y límites
 
-- `.env`, bases locales y entornos virtuales estan excluidos de Git.
-- La descripcion del usuario se valida y se presenta a Gemini como datos no
-  confiables, separada de las reglas del sistema.
+- `.env`, bases locales y entornos virtuales están excluidos de Git.
+- La descripción se trata como entrada no confiable y se valida antes de Gemini.
 - El parser rechaza Markdown, campos adicionales, referencias inexistentes,
-  jerarquias ciclicas, duplicados y rangos salariales incoherentes.
-- Ninguna vacante se publica automaticamente: todas nacen en estado `DRAFT`.
-- El modo `GOOGLE` requiere revisar costos, cuotas, privacidad y terminos del
-  servicio antes de usar datos reales.
+  jerarquías cíclicas, duplicados y salarios incoherentes.
+- Ninguna vacante se publica automáticamente: todas nacen en estado `DRAFT`.
+- El modo `GOOGLE` exige revisar costos, cuotas, privacidad y términos del
+  proveedor antes de procesar información real.

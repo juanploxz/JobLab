@@ -3,6 +3,26 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from organization.domain.validators import (
+    MAX_ASSUMPTION_LENGTH,
+    MAX_ASSUMPTIONS,
+    MAX_AVAILABLE_POSITIONS,
+    MAX_COMPANY_SUMMARY_LENGTH,
+    MAX_KNOWLEDGE_LENGTH,
+    MAX_REQUIRED_KNOWLEDGE,
+    MAX_UNIT_DESCRIPTION_LENGTH,
+    MAX_VACANCY_DESCRIPTION_LENGTH,
+    MIN_AVAILABLE_POSITIONS,
+    MIN_ASSUMPTION_LENGTH,
+    MIN_COMPANY_NAME_LENGTH,
+    MIN_COMPANY_SUMMARY_LENGTH,
+    MIN_KNOWLEDGE_LENGTH,
+    MIN_UNIT_DESCRIPTION_LENGTH,
+    MIN_UNIT_NAME_LENGTH,
+    MIN_VACANCY_DESCRIPTION_LENGTH,
+    MIN_VACANCY_NAME_LENGTH,
+)
+
 
 class StrictProposalModel(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
@@ -10,28 +30,52 @@ class StrictProposalModel(BaseModel):
 
 class DepartmentProposal(StrictProposalModel):
     code: str = Field(min_length=2, max_length=40, pattern=r"^[A-Z][A-Z0-9_]*$")
-    name: str = Field(min_length=2, max_length=120)
-    description: str = Field(min_length=30, max_length=1000)
-    parent_code: str | None = Field(default=None, max_length=40)
+    name: str = Field(min_length=MIN_UNIT_NAME_LENGTH, max_length=120)
+    description: str = Field(
+        min_length=MIN_UNIT_DESCRIPTION_LENGTH,
+        max_length=MAX_UNIT_DESCRIPTION_LENGTH,
+    )
+    parent_code: str | None = Field(
+        default=None,
+        min_length=2,
+        max_length=40,
+        pattern=r"^[A-Z][A-Z0-9_]*$",
+    )
 
     @field_validator("code", "parent_code", mode="before")
     @classmethod
     def normalize_codes(cls, value: object) -> object:
         if isinstance(value, str):
-            return value.strip().upper().replace("-", "_").replace(" ", "_")
+            normalized = value.strip().upper().replace("-", "_").replace(" ", "_")
+            if not normalized:
+                raise ValueError("El codigo no puede estar vacio")
+            return normalized
         return value
 
 
 class VacancyProposal(StrictProposalModel):
-    department_code: str = Field(min_length=2, max_length=40)
-    name: str = Field(min_length=3, max_length=140)
-    available_positions: int = Field(ge=1, le=500)
+    department_code: str = Field(
+        min_length=2,
+        max_length=40,
+        pattern=r"^[A-Z][A-Z0-9_]*$",
+    )
+    name: str = Field(min_length=MIN_VACANCY_NAME_LENGTH, max_length=140)
+    available_positions: int = Field(
+        ge=MIN_AVAILABLE_POSITIONS,
+        le=MAX_AVAILABLE_POSITIONS,
+    )
     salary_min: Decimal = Field(ge=0, max_digits=14, decimal_places=2)
     salary_max: Decimal = Field(ge=0, max_digits=14, decimal_places=2)
     currency: Literal["COP", "USD", "EUR", "MXN"] = "COP"
     salary_period: Literal["HOURLY", "MONTHLY", "ANNUAL"] = "MONTHLY"
-    description: str = Field(min_length=50, max_length=2000)
-    required_knowledge: list[str] = Field(min_length=1, max_length=20)
+    description: str = Field(
+        min_length=MIN_VACANCY_DESCRIPTION_LENGTH,
+        max_length=MAX_VACANCY_DESCRIPTION_LENGTH,
+    )
+    required_knowledge: list[str] = Field(
+        min_length=1,
+        max_length=MAX_REQUIRED_KNOWLEDGE,
+    )
     reports_to: str | None = Field(default=None, max_length=140)
 
     @field_validator("department_code", "currency", "salary_period", mode="before")
@@ -46,8 +90,11 @@ class VacancyProposal(StrictProposalModel):
         seen: set[str] = set()
         for value in values:
             item = " ".join(value.split())
-            if len(item) < 2:
-                raise ValueError("Cada conocimiento debe tener al menos dos caracteres")
+            if not MIN_KNOWLEDGE_LENGTH <= len(item) <= MAX_KNOWLEDGE_LENGTH:
+                raise ValueError(
+                    "Cada conocimiento debe tener entre "
+                    f"{MIN_KNOWLEDGE_LENGTH} y {MAX_KNOWLEDGE_LENGTH} caracteres"
+                )
             key = item.casefold()
             if key not in seen:
                 normalized.append(item)
@@ -64,16 +111,26 @@ class VacancyProposal(StrictProposalModel):
 
 
 class OrganizationProposal(StrictProposalModel):
-    company_name: str = Field(min_length=3, max_length=160)
-    company_summary: str = Field(min_length=40, max_length=2000)
-    assumptions: list[str] = Field(default_factory=list, max_length=20)
+    company_name: str = Field(min_length=MIN_COMPANY_NAME_LENGTH, max_length=160)
+    company_summary: str = Field(
+        min_length=MIN_COMPANY_SUMMARY_LENGTH,
+        max_length=MAX_COMPANY_SUMMARY_LENGTH,
+    )
+    assumptions: list[str] = Field(default_factory=list, max_length=MAX_ASSUMPTIONS)
     departments: list[DepartmentProposal] = Field(min_length=1, max_length=50)
     vacancies: list[VacancyProposal] = Field(min_length=1, max_length=200)
 
     @field_validator("assumptions")
     @classmethod
     def normalize_assumptions(cls, values: list[str]) -> list[str]:
-        return [" ".join(value.split()) for value in values if value and value.strip()]
+        normalized = [" ".join(value.split()) for value in values if value and value.strip()]
+        for assumption in normalized:
+            if not MIN_ASSUMPTION_LENGTH <= len(assumption) <= MAX_ASSUMPTION_LENGTH:
+                raise ValueError(
+                    "Cada supuesto debe tener entre "
+                    f"{MIN_ASSUMPTION_LENGTH} y {MAX_ASSUMPTION_LENGTH} caracteres"
+                )
+        return normalized
 
     @model_validator(mode="after")
     def validate_organization_graph(self) -> "OrganizationProposal":
@@ -119,4 +176,7 @@ class OrganizationProposal(StrictProposalModel):
             if current_code in visited:
                 raise ValueError("La jerarquia de departamentos contiene un ciclo")
             visited.add(current_code)
-            current_code = departments_by_code[current_code].parent_code
+            current_department = departments_by_code.get(current_code)
+            if current_department is None:
+                raise ValueError(f"El departamento padre {current_code} no existe")
+            current_code = current_department.parent_code
