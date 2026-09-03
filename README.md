@@ -1,4 +1,10 @@
 # JobLab
+Integrantes:
+
+Juan Pablo Parra El-Masri
+Isabela Valencia Pino
+Juan Antonio Buendía Sanchez
+Joan Stiven Peralta Bedoya
 
 JobLab convierte la descripción de una empresa en un borrador validado de su
 estructura organizacional y de las vacantes necesarias. La solución combina una
