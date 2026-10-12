@@ -61,6 +61,21 @@ transacciones. Los validadores y el Builder aplican reglas reutilizables. La
 infraestructura encapsula los proveedores externos. Los serializers explícitos
 y los DTOs mantienen estable el contrato REST sin exponer modelos completos.
 
+## Arquitectura híbrida con Strangler Pattern
+
+El proyecto ya está preparado para una estrategia de extracción gradual: el monolito Django sigue siendo el sistema principal y la funcionalidad crítica de generación del plan organizacional puede salir a un microservicio Flask sin romper el negocio.
+
+- `Django` mantiene el sistema legacy y la capa de experiencia/administración.
+- `Flask` expone una ruta dedicada para la generación del plan organizacional en `/api/v2/organizational-plan/`.
+- `Nginx` bifurca el tráfico según la ruta: el dominio principal sigue apuntando a Django y la ruta de migración va hacia Flask.
+- `PostgreSQL` se usa en contenedores para emular un entorno de servicios separados y facilitar la demostración del patrón.
+
+Ruta activa del microservicio:
+
+```powershell
+Invoke-RestMethod -Method Post -Uri "http://127.0.0.1/api/v2/organizational-plan/" -ContentType "application/json" -Body (@{ company_description = "Somos una empresa de software..." } | ConvertTo-Json)
+```
+
 ## API REST
 
 | Método y ruta | Resultado |
@@ -70,6 +85,7 @@ y los DTOs mantienen estable el contrato REST sin exponer modelos completos.
 | `GET /api/v1/plans/{id}/` | Obtiene el detalle, las métricas, unidades y vacantes. |
 | `POST /api/v1/plans/{id}/vacancies/` | Crea una vacante mediante `VacancyBuilder`. |
 | `GET /api/v1/plans/{id}/vacancies/{vacancy_id}/` | Obtiene la vacante creada. |
+| `POST /api/v2/organizational-plan/` | Genera una propuesta desde el microservicio Flask en modo estrangulador. |
 
 Ejemplo de generación:
 
