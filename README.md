@@ -65,6 +65,9 @@ y los DTOs mantienen estable el contrato REST sin exponer modelos completos.
 
 El proyecto ya está preparado para una estrategia de extracción gradual: el monolito Django sigue siendo el sistema principal y la funcionalidad crítica de generación del plan organizacional puede salir a un microservicio Flask sin romper el negocio.
 
+- La documentación independiente para el Taller 02 está en
+  [Implementación del patrón Estrangulador](docs/IMPLEMENTACION_PATRON_ESTRANGULADOR.md);
+  no forma parte de `docs/ENTREGABLE_1.md`.
 - `Django` mantiene el sistema legacy y la capa de experiencia/administración.
 - `Flask` expone una ruta dedicada para la generación del plan organizacional en `/api/v2/organizational-plan/`.
 - `Nginx` bifurca el tráfico según la ruta: el dominio principal sigue apuntando a Django y la ruta de migración va hacia Flask.
@@ -73,7 +76,33 @@ El proyecto ya está preparado para una estrategia de extracción gradual: el mo
 Ruta activa del microservicio:
 
 ```powershell
-Invoke-RestMethod -Method Post -Uri "http://127.0.0.1/api/v2/organizational-plan/" -ContentType "application/json" -Body (@{ company_description = "Somos una empresa de software..." } | ConvertTo-Json)
+docker compose up --build -d
+
+Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:5000/health"
+
+$body = @{
+    company_description = "Somos una empresa de software que desarrolla productos digitales para PYMES y necesita una estructura clara para ingeniería, operaciones y ventas."
+} | ConvertTo-Json -Compress
+
+$plan = Invoke-RestMethod `
+    -Method Post `
+    -Uri "http://127.0.0.1/api/v2/organizational-plan/" `
+    -ContentType "application/json; charset=utf-8" `
+    -Body ([System.Text.Encoding]::UTF8.GetBytes($body))
+
+$plan | ConvertTo-Json -Depth 10
+```
+
+La respuesta debe tener `source = flask`, `pattern = strangler` y una propuesta
+con departamentos y vacantes. La misma ruta en el puerto `5000` permite probar
+Flask directamente; usar el puerto `80` comprueba el enrutamiento de Nginx.
+Las rutas no extraídas, como `/`, continúan llegando a Django. Para detener la
+pila: `docker compose down`.
+
+Pruebas automatizadas del microservicio, sin levantar contenedores:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s microservice -p "test_*.py"
 ```
 
 ## API REST
