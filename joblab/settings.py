@@ -17,9 +17,15 @@ SECRET_KEY = os.environ.get(
 DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() in {"1", "true", "yes", "on"}
 ALLOWED_HOSTS = [
     host.strip()
-    for host in os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+    for host in os.environ.get(
+        "DJANGO_ALLOWED_HOSTS",
+        "127.0.0.1,localhost,0.0.0.0,django,nginx",
+    ).split(",")
     if host.strip()
 ]
+# Internal names are always accepted so container health checks keep working
+# when DJANGO_ALLOWED_HOSTS only lists the public IP or domain.
+ALLOWED_HOSTS += [host for host in ("127.0.0.1", "localhost", "django") if host not in ALLOWED_HOSTS]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -36,6 +42,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "joblab.middleware.RequestContextMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -54,6 +61,7 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
+                "django.template.context_processors.i18n",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
@@ -64,12 +72,25 @@ TEMPLATES = [
 WSGI_APPLICATION = "joblab.wsgi.application"
 ASGI_APPLICATION = "joblab.asgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+DB_ENGINE = os.environ.get("DB_ENGINE", "sqlite").strip().lower()
+if DB_ENGINE == "postgres":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("DB_NAME", "joblab"),
+            "USER": os.environ.get("DB_USER", "joblab"),
+            "PASSWORD": os.environ.get("DB_PASSWORD", "joblab"),
+            "HOST": os.environ.get("DB_HOST", "localhost"),
+            "PORT": os.environ.get("DB_PORT", "5432"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -78,7 +99,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-LANGUAGE_CODE = "es-co"
+LANGUAGE_CODE = "es"
+LANGUAGES = [
+    ("es", "Español"),
+    ("en", "English"),
+]
+LOCALE_PATHS = [BASE_DIR / "locale"]
 TIME_ZONE = "America/Bogota"
 USE_I18N = True
 USE_TZ = True
@@ -102,6 +128,24 @@ REST_FRAMEWORK = {
 AI_PROVIDER = os.environ.get("AI_PROVIDER", "MOCK").strip().upper()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite").strip()
+
+# Strangler pattern: when PLAN_SERVICE_URL is set, every plan use case is routed to the Flask
+# plan-service. When it is empty, the legacy in-process Service Layer answers (rollback path).
+PLAN_SERVICE_URL = os.environ.get("PLAN_SERVICE_URL", "").strip()
+INTEGRATION_SERVICE_URL = os.environ.get("INTEGRATION_SERVICE_URL", "").strip()
+REPORT_SERVICE_URL = os.environ.get("REPORT_SERVICE_URL", "").strip()
+SERVICE_TIMEOUT_SECONDS = float(os.environ.get("SERVICE_TIMEOUT_SECONDS", "8"))
+CIRCUIT_FAILURE_THRESHOLD = int(os.environ.get("CIRCUIT_FAILURE_THRESHOLD", "3"))
+CIRCUIT_RESET_SECONDS = float(os.environ.get("CIRCUIT_RESET_SECONDS", "30"))
+
+# Behind Nginx (API Gateway) the original scheme and host arrive in X-Forwarded-* headers.
+USE_X_FORWARDED_HOST = os.environ.get("DJANGO_USE_X_FORWARDED_HOST", "True").lower() in {"1", "true"}
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
 
 LOGGING = {
     "version": 1,

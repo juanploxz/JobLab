@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Servicio no disponible" %} | JobLab{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container narrow">
+        <div class="empty-state" role="alert">
+            <h1 class="page-title">{% trans "Servicio no disponible" %}</h1>
+            <p>{% blocktrans %}El microservicio {{ service }} no respondió a tiempo. El resto de JobLab sigue funcionando; intenta de nuevo en unos segundos.{% endblocktrans %}</p>
+            <a class="button button-primary" href="{{ request.get_full_path }}">{% trans "Reintentar" %}</a>
+            <a class="button button-secondary" href="{% url 'organization:status' %}">{% trans "Ver estado del sistema" %}</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,178 @@
+# JobLab - Entrega 2: hybrid ecosystem (Django + Flask microservices) behind an Nginx API Gateway.
+# Only the gateway publishes a port; every other container is reachable only on the internal network.
+#   docker compose up -d --build
+#   http://localhost/            (or http://<elastic-ip>/ on AWS EC2)
+
+x-restart: &restart
+  restart: unless-stopped
+
+x-logging: &logging
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    <<: [*restart, *logging]
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-joblab}
+      POSTGRES_USER: ${POSTGRES_USER:-joblab}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-joblab}
+      PLAN_DB_NAME: ${PLAN_DB_NAME:-plan_service}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./deploy/postgres/init-databases.sh:/docker-entrypoint-initdb.d/10-init-databases.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    <<: [*restart, *logging]
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "128mb", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  plan-service:
+    build:
+      context: ./services/plan_service
+    <<: [*restart, *logging]
+    environment:
+      PLAN_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-joblab}:${POSTGRES_PASSWORD:-joblab}@postgres:5432/${PLAN_DB_NAME:-plan_service}
+      AI_PROVIDER: ${AI_PROVIDER:-MOCK}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash-lite}
+      CELERY_BROKER_URL: redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  integration-service:
+    build:
+      context: ./services/integration_service
+    <<: [*restart, *logging]
+    environment:
+      EXCHANGE_PROVIDERS: ${EXCHANGE_PROVIDERS:-open_er_api,frankfurter,static}
+      ALLY_SERVICE_NAME: ${ALLY_SERVICE_NAME:-Equipo aliado}
+      ALLY_SERVICE_URL: ${ALLY_SERVICE_URL:-}
+      ALLY_ITEMS_PATH: ${ALLY_ITEMS_PATH:-}
+      ALLY_FIELD_TITLE: ${ALLY_FIELD_TITLE:-name,title,nombre,titulo}
+      ALLY_FIELD_SUBTITLE: ${ALLY_FIELD_SUBTITLE:-category,company,empresa,categoria,type,tipo}
+      ALLY_FIELD_DESCRIPTION: ${ALLY_FIELD_DESCRIPTION:-description,descripcion,summary,resumen,detail}
+      ALLY_FIELD_URL: ${ALLY_FIELD_URL:-url,link,enlace}
+      ALLY_API_KEY: ${ALLY_API_KEY:-}
+
+  report-service:
+    build:
+      context: ./services/report_service
+    <<: [*restart, *logging]
+    environment: &report-env
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      NOTIFICATION_STORE_URL: redis://redis:6379/2
+      PLAN_SERVICE_URL: http://plan-service:5000
+      INTEGRATION_SERVICE_URL: http://integration-service:5000
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      NOTIFY_EMAIL_FROM: ${NOTIFY_EMAIL_FROM:-joblab@localhost}
+      NOTIFY_EMAIL_TO: ${NOTIFY_EMAIL_TO:-}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=4).status == 200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./services/report_service
+    <<: [*restart, *logging]
+    command: ["celery", "-A", "report_service.celery_app", "worker", "-Q", "reports,notifications", "--loglevel=INFO", "--concurrency=2"]
+    environment: *report-env
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A report_service.celery_app inspect ping -d celery@$$HOSTNAME --timeout 5 | grep -q pong"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      redis:
+        condition: service_healthy
+      plan-service:
+        condition: service_healthy
+
+  django:
+    build:
+      context: .
+    <<: [*restart, *logging]
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-change-me-in-the-env-file}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-False}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,django}
+      DJANGO_CSRF_TRUSTED_ORIGINS: ${DJANGO_CSRF_TRUSTED_ORIGINS:-}
+      AI_PROVIDER: ${AI_PROVIDER:-MOCK}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      DB_ENGINE: postgres
+      DB_NAME: ${POSTGRES_DB:-joblab}
+      DB_USER: ${POSTGRES_USER:-joblab}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-joblab}
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      PLAN_SERVICE_URL: http://plan-service:5000
+      INTEGRATION_SERVICE_URL: http://integration-service:5000
+      REPORT_SERVICE_URL: http://report-service:5000
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
+    volumes:
+      - static_files:/app/staticfiles
+    depends_on:
+      postgres:
+        condition: service_healthy
+      plan-service:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:1.27-alpine
+    <<: [*restart, *logging]
+    ports:
+      - "${GATEWAY_PORT:-80}:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_files:/var/www/static:ro
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/gateway/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      django:
+        condition: service_healthy
+      plan-service:
+        condition: service_healthy
+      integration-service:
+        condition: service_healthy
+      report-service:
+        condition: service_healthy
+
+volumes:
+  # New name: a volume left by Taller 02 would skip the init script that creates plan_service.
+  pgdata:
+  redis_data:
+  static_files:

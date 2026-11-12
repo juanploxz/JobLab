@@ -1,6 +1,7 @@
 """Uniform HTTP error representation for the REST presentation layer."""
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import gettext as _
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -30,7 +31,7 @@ def error_response(
 def serializer_error_response(fields) -> Response:
     return error_response(
         code="invalid_request",
-        detail="La solicitud contiene datos invalidos.",
+        detail=_("La solicitud contiene datos invalidos."),
         fields=fields,
         status_code=status.HTTP_400_BAD_REQUEST,
     )
@@ -58,7 +59,7 @@ def application_error_response(exc: Exception) -> Response:
     if isinstance(exc, (GenerationError, ImproperlyConfigured)):
         return error_response(
             code="generation_service_unavailable",
-            detail="El servicio de generacion no esta disponible en este momento.",
+            detail=_("El servicio de generacion no esta disponible en este momento."),
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
     raise TypeError(f"Unsupported application exception: {type(exc).__name__}")

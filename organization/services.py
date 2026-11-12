@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from django.db import IntegrityError, transaction
 from django.db.models import Prefetch, QuerySet
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from organization.domain.builders import VacancyBuilder
 from organization.domain.exceptions import (
@@ -71,8 +72,10 @@ class GenerateOrganizationService:
                 update_fields=("status", "completed_at", "error_message")
             )
             raise GenerationError(
-                "No fue posible generar la estructura. Revisa la configuracion "
-                "del proveedor o intenta nuevamente."
+                _(
+                    "No fue posible generar la estructura. Revisa la configuracion "
+                    "del proveedor o intenta nuevamente."
+                )
             ) from exc
 
     @staticmethod
@@ -217,7 +220,7 @@ class GetOrganizationalPlanService:
             plan = queryset.get(pk=plan_id)
         except self._plan_model.DoesNotExist as exc:
             raise ResourceNotFoundError(
-                f"No existe un plan organizacional con id {plan_id}.",
+                _("No existe un plan organizacional con id %(plan_id)s.") % {"plan_id": plan_id},
                 code="plan_not_found",
             ) from exc
 
@@ -269,7 +272,7 @@ class CreateVacancyService:
             plan = self._plan_model.objects.get(pk=plan_id)
         except self._plan_model.DoesNotExist as exc:
             raise ResourceNotFoundError(
-                f"No existe un plan organizacional con id {plan_id}.",
+                _("No existe un plan organizacional con id %(plan_id)s.") % {"plan_id": plan_id},
                 code="plan_not_found",
             ) from exc
 
@@ -277,7 +280,7 @@ class CreateVacancyService:
             department = self._unit_model.objects.get(pk=command.department_id, plan=plan)
         except self._unit_model.DoesNotExist as exc:
             raise ResourceNotFoundError(
-                "El departamento indicado no existe dentro del plan.",
+                _("El departamento indicado no existe dentro del plan."),
                 code="department_not_found",
             ) from exc
 
@@ -289,7 +292,7 @@ class CreateVacancyService:
         ).exists()
         if duplicate_exists:
             raise ResourceConflictError(
-                "Ya existe una vacante con ese nombre en el departamento.",
+                _("Ya existe una vacante con ese nombre en el departamento."),
                 code="vacancy_already_exists",
             )
 
@@ -315,7 +318,7 @@ class CreateVacancyService:
                 vacancy.save()
         except IntegrityError as exc:
             raise ResourceConflictError(
-                "La vacante entra en conflicto con un registro existente.",
+                _("La vacante entra en conflicto con un registro existente."),
                 code="vacancy_already_exists",
             ) from exc
         return _vacancy_to_dto(vacancy)
@@ -335,7 +338,7 @@ class GetVacancyService:
             )
         except self._vacancy_model.DoesNotExist as exc:
             raise ResourceNotFoundError(
-                "La vacante indicada no existe dentro del plan.",
+                _("La vacante indicada no existe dentro del plan."),
                 code="vacancy_not_found",
             ) from exc
         return _vacancy_to_dto(vacancy)

@@ -1,0 +1,45 @@
+# English catalog of the JobLab integration microservice.
+msgid ""
+msgstr ""
+"Project-Id-Version: joblab-integration-service 2.0\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "El cuerpo JSON está mal formado."
+msgstr "The JSON body is malformed."
+
+msgid "El cuerpo debe ser un objeto JSON."
+msgstr "The body must be a JSON object."
+
+msgid "La moneda destino debe ser una de: %(options)s."
+msgstr "The target currency must be one of: %(options)s."
+
+msgid "items debe ser una lista de máximo %(maximum)s salarios con salary_min, salary_max y currency."
+msgstr "items must be a list of at most %(maximum)s salaries with salary_min, salary_max and currency."
+
+msgid "Cada rango salarial debe ser numérico, no negativo y ordenado."
+msgstr "Each salary range must be numeric, non-negative and ordered."
+
+msgid "La moneda %(currency)s no está disponible."
+msgstr "The currency %(currency)s is not available."
+
+msgid "La integración con el equipo aliado aún no está configurada."
+msgstr "The integration with the allied team is not configured yet."
+
+msgid "El proveedor externo no está disponible en este momento."
+msgstr "The external provider is not available right now."
+
+msgid "Recurso no encontrado."
+msgstr "Resource not found."
+
+msgid "Método no permitido para este recurso."
+msgstr "Method not allowed for this resource."
+
+msgid "La solicitud no pudo ser procesada."
+msgstr "The request could not be processed."
+
+msgid "El microservicio no pudo procesar la solicitud."
+msgstr "The microservice could not process the request."
