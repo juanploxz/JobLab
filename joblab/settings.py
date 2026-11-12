@@ -23,6 +23,9 @@ ALLOWED_HOSTS = [
     ).split(",")
     if host.strip()
 ]
+# Internal names are always accepted so container health checks keep working
+# when DJANGO_ALLOWED_HOSTS only lists the public IP or domain.
+ALLOWED_HOSTS += [host for host in ("127.0.0.1", "localhost", "django") if host not in ALLOWED_HOSTS]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
