@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Estado" %} | JobLab{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container narrow">
+        <span class="eyebrow">{% trans "Observabilidad" %}</span>
+        <h1 class="page-title">{% trans "Estado del ecosistema" %}</h1>
+        <p class="muted">{% blocktrans %}Los planes se atienden actualmente desde: {{ plan_backend }}.{% endblocktrans %}</p>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <caption class="visually-hidden">{% trans "Salud de cada servicio" %}</caption>
+                <thead>
+                    <tr><th scope="col">{% trans "Servicio" %}</th><th scope="col">{% trans "Estado" %}</th><th scope="col">{% trans "Latencia" %}</th><th scope="col">{% trans "Detalles" %}</th></tr>
+                </thead>
+                <tbody>
+                    {% for service in services %}
+                        <tr>
+                            <th scope="row">{{ service.name }}</th>
+                            <td>
+                                {% if not service.configured %}<span class="status-badge status-pending">{% trans "No configurado" %}</span>
+                                {% elif service.healthy %}<span class="status-badge status-ok">{% trans "Operativo" %}</span>
+                                {% else %}<span class="status-badge status-error">{% trans "Sin respuesta" %}</span>{% endif %}
+                            </td>
+                            <td>{% if service.latency_ms is not None %}{{ service.latency_ms }} ms{% else %}&mdash;{% endif %}</td>
+                            <td>{% for key, value in service.details.items %}<code>{{ key }}={{ value }}</code> {% empty %}&mdash;{% endfor %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

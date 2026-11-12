@@ -1,31 +1,43 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Historial | JobLab{% endblock %}
+{% block title %}{% trans "Historial" %} | JobLab{% endblock %}
 
 {% block content %}
 <section class="page-section">
     <div class="container">
         <div class="section-heading history-heading">
-            <div><span class="eyebrow">Historial local</span><h1>Planes generados</h1><p>Revisa los borradores creados en esta instalacion.</p></div>
-            <a class="button button-primary" href="{% url 'organization:generate' %}">Nueva estructura</a>
+            <div>
+                <span class="eyebrow">{% trans "Historial" %}</span>
+                <h1>{% trans "Planes generados" %}</h1>
+                <p>{% blocktrans count counter=page.count %}{{ counter }} plan registrado.{% plural %}{{ counter }} planes registrados.{% endblocktrans %}</p>
+            </div>
+            <a class="button button-primary" href="{% url 'organization:generate' %}">{% trans "Nueva estructura" %}</a>
         </div>
         <div class="history-grid">
-            {% for plan in plans %}
-                <a class="history-card" href="{% url 'organization:detail' plan.pk %}">
-                    <div class="history-meta"><span>{{ plan.request.provider_name }}</span><time datetime="{{ plan.created_at|date:'c' }}">{{ plan.created_at|date:"d M Y, H:i" }}</time></div>
+            {% for row in plans %}
+                {% with plan=row.summary %}
+                <a class="history-card" href="{% url 'organization:detail' plan.id %}">
+                    <div class="history-meta"><span>{{ plan.provider_name }}</span><time datetime="{{ plan.created_at|date:'c' }}">{{ plan.created_at|date:"DATETIME_FORMAT" }}</time></div>
                     <h2>{{ plan.company_name }}</h2>
                     <p>{{ plan.company_summary|truncatechars:180 }}</p>
-                    <span class="history-link">Ver estructura &rarr;</span>
+                    <span class="status-pill">{{ row.review_status_label }}</span>
+                    <span class="history-link">{% trans "Ver estructura" %} &rarr;</span>
                 </a>
+                {% endwith %}
             {% empty %}
-                <div class="empty-state"><h2>Aun no hay planes</h2><p>Crea el primero a partir de la descripcion de una empresa.</p></div>
+                <div class="empty-state">
+                    <h2>{% trans "Aún no hay planes" %}</h2>
+                    <p>{% trans "Crea el primero a partir de la descripción de una empresa." %}</p>
+                    <a class="button button-primary" href="{% url 'organization:generate' %}">{% trans "Crear estructura" %}</a>
+                </div>
             {% endfor %}
         </div>
-        {% if is_paginated %}
-            <nav class="pagination" aria-label="Paginacion">
-                {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Anterior</a>{% endif %}
-                <span>Pagina {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-                {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Siguiente</a>{% endif %}
+        {% if page.num_pages > 1 %}
+            <nav class="pagination" aria-label="{% trans 'Paginación' %}">
+                {% if page.has_previous %}<a href="?page={{ page.page|add:'-1' }}" rel="prev">{% trans "Anterior" %}</a>{% endif %}
+                <span aria-current="page">{% blocktrans with number=page.page total=page.num_pages %}Página {{ number }} de {{ total }}{% endblocktrans %}</span>
+                {% if page.has_next %}<a href="?page={{ page.page|add:'1' }}" rel="next">{% trans "Siguiente" %}</a>{% endif %}
             </nav>
         {% endif %}
     </div>

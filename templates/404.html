@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Página no encontrada" %} | JobLab{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container narrow">
+        <div class="empty-state">
+            <p class="eyebrow">404</p>
+            <h1 class="page-title">{% trans "Página no encontrada" %}</h1>
+            <p>{% trans "El recurso que buscas no existe o fue eliminado." %}</p>
+            <a class="button button-primary" href="{% url 'organization:generate' %}">{% trans "Ir al inicio" %}</a>
+            <a class="button button-secondary" href="{% url 'organization:history' %}">{% trans "Ver historial" %}</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

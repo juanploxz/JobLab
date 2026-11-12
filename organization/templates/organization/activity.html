@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Actividad" %} | JobLab{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container narrow">
+        <span class="eyebrow">{% trans "Eventos asíncronos" %}</span>
+        <h1 class="page-title">{% trans "Actividad reciente" %}</h1>
+        <p class="muted">{% trans "Notificaciones producidas por el worker de Celery a partir de los eventos publicados en Redis." %}</p>
+
+        {% if not available %}
+            <div class="empty-state"><h2>{% trans "El servicio de notificaciones no está disponible" %}</h2></div>
+        {% else %}
+            <ol class="timeline">
+                {% for item in notifications %}
+                    <li>
+                        <time datetime="{{ item.created_at }}">{{ item.created_at|slice:":10" }} {{ item.created_at|slice:"11:16" }} UTC</time>
+                        {% if item.type == "plan.created" %}
+                            {% blocktrans with plan_id=item.data.plan_id company=item.data.company_name vacancies=item.data.vacancy_count %}Se generó el plan #{{ plan_id }} para {{ company }} con {{ vacancies }} tipos de vacante.{% endblocktrans %}
+                            <a href="{% url 'organization:detail' item.data.plan_id %}">{% trans "Ver plan" %}</a>
+                        {% elif item.type == "vacancy.created" %}
+                            {% blocktrans with name=item.data.vacancy_name plan_id=item.data.plan_id %}Se creó la vacante {{ name }} en el plan #{{ plan_id }}.{% endblocktrans %}
+                        {% elif item.type == "report.ready" %}
+                            {% blocktrans with plan_id=item.data.plan_id fmt=item.data.format|upper %}El reporte {{ fmt }} del plan #{{ plan_id }} está listo.{% endblocktrans %}
+                            <a href="{% url 'organization:report-status' item.data.task_id %}">{% trans "Descargar" %}</a>
+                        {% else %}
+                            {{ item.type }}
+                        {% endif %}
+                    </li>
+                {% empty %}
+                    <li>{% trans "Todavía no hay actividad. Genera un plan para ver el primer evento." %}</li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

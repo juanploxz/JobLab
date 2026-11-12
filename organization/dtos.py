@@ -58,6 +58,37 @@ class VacancyDTO:
 
 
 @dataclass(frozen=True, slots=True)
+class PlanSummaryDTO:
+    id: int
+    company_name: str
+    company_summary: str
+    review_status: str
+    generation_status: str
+    provider_name: str
+    created_at: datetime
+
+
+@dataclass(frozen=True, slots=True)
+class PlanPageDTO:
+    items: tuple[PlanSummaryDTO, ...]
+    count: int
+    page: int
+    page_size: int
+
+    @property
+    def num_pages(self) -> int:
+        return max(1, -(-self.count // self.page_size))
+
+    @property
+    def has_next(self) -> bool:
+        return self.page < self.num_pages
+
+    @property
+    def has_previous(self) -> bool:
+        return self.page > 1
+
+
+@dataclass(frozen=True, slots=True)
 class PlanDetailDTO:
     id: int
     request_id: int

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Estado del reporte" %} | JobLab{% endblock %}
+{% block head %}{% if not finished %}<meta http-equiv="refresh" content="3">{% endif %}{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container narrow">
+        <nav class="breadcrumb breadcrumb-light" aria-label="{% trans 'Ruta de navegación' %}">
+            <a href="{% url 'organization:detail' report.plan_id %}">{% blocktrans with plan_id=report.plan_id %}Plan #{{ plan_id }}{% endblocktrans %}</a>
+            <span aria-hidden="true">/</span><span aria-current="page">{% trans "Reporte" %}</span>
+        </nav>
+        <span class="eyebrow">{% trans "Tarea asíncrona" %}</span>
+        <h1 class="page-title">{% trans "Estado del reporte" %}</h1>
+
+        <div class="status-panel" role="status" aria-live="polite">
+            {% if report.status == "SUCCESS" %}
+                <p class="status-badge status-ok">{% trans "Listo" %}</p>
+                <p>{% trans "El reporte se generó correctamente." %}</p>
+                <a class="button button-primary" href="{% url 'organization:report-download' task_id %}">{% trans "Descargar reporte" %}</a>
+            {% elif report.status == "FAILURE" %}
+                <p class="status-badge status-error">{% trans "Falló" %}</p>
+                <p>{{ report.error.detail|default:_("No fue posible generar el reporte.") }}</p>
+                <a class="button button-secondary" href="{% url 'organization:detail' report.plan_id %}">{% trans "Volver al plan" %}</a>
+            {% else %}
+                <p class="status-badge status-pending"><span class="spinner" aria-hidden="true"></span> {% trans "En proceso" %}</p>
+                <p>{% trans "Un worker de Celery está preparando el archivo. Esta página se actualiza automáticamente cada 3 segundos." %}</p>
+                <a class="button button-secondary" href="{% url 'organization:report-status' task_id %}">{% trans "Actualizar ahora" %}</a>
+            {% endif %}
+        </div>
+        <dl class="definition-list">
+            <div><dt>{% trans "Identificador" %}</dt><dd><code>{{ task_id }}</code></dd></div>
+            <div><dt>{% trans "Formato" %}</dt><dd>{{ report.format|upper }}</dd></div>
+            <div><dt>{% trans "Estado técnico" %}</dt><dd>{{ report.status }}</dd></div>
+        </dl>
+    </div>
+</section>
+{% endblock %}
