@@ -13,6 +13,11 @@ db.sqlite3
 media/
 staticfiles/
 
+# Flask microservices (local SQLite and instance folders)
+instance/
+*.db
+celerybeat-schedule*
+
 # Secrets and local configuration
 .env
 .env.*
