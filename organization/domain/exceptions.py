@@ -21,6 +21,15 @@ class ResourceNotFoundError(LookupError):
         self.code = code or self.default_code
 
 
+class ServiceUnavailableError(RuntimeError):
+    """Raised by a gateway when a remote microservice cannot answer (timeout, 5xx, open circuit)."""
+
+    def __init__(self, service: str, detail: str = "") -> None:
+        super().__init__(detail or service)
+        self.service = service
+        self.detail = detail
+
+
 class ResourceConflictError(RuntimeError):
     """Raised when a valid command conflicts with persisted application state."""
 

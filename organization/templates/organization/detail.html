@@ -1,28 +1,32 @@
 {% extends "base.html" %}
-{% load humanize %}
+{% load i18n %}
 
-{% block title %}{{ plan.company_name }} | JobLab{% endblock %}
+{% block title %}{{ page.plan.company_name }} | JobLab{% endblock %}
 
 {% block content %}
+{% with plan=page.plan %}
 <section class="plan-hero">
     <div class="container">
-        <div class="breadcrumb"><a href="{% url 'organization:generate' %}">Crear estructura</a><span>/</span>Plan #{{ plan.pk }}</div>
+        <nav class="breadcrumb" aria-label="{% trans 'Ruta de navegación' %}">
+            <a href="{% url 'organization:history' %}">{% trans "Historial" %}</a><span aria-hidden="true">/</span>
+            <span aria-current="page">{% blocktrans with plan_id=plan.id %}Plan #{{ plan_id }}{% endblocktrans %}</span>
+        </nav>
         <div class="plan-heading">
             <div>
-                <span class="eyebrow">Plan organizacional</span>
+                <span class="eyebrow">{% trans "Plan organizacional" %}</span>
                 <h1>{{ plan.company_name }}</h1>
                 <p>{{ plan.company_summary }}</p>
             </div>
             <div class="status-card">
                 <span class="status-dot" aria-hidden="true"></span>
-                <div><small>Estado</small><strong>{{ plan.get_review_status_display }}</strong></div>
+                <div><small>{% trans "Estado" %}</small><strong>{{ page.review_status_label }}</strong></div>
             </div>
         </div>
-        <div class="metrics" aria-label="Resumen del plan">
-            <div><strong>{{ department_count }}</strong><span>areas</span></div>
-            <div><strong>{{ vacancy_count }}</strong><span>tipos de vacante</span></div>
-            <div><strong>{{ total_positions }}</strong><span>puestos sugeridos</span></div>
-            <div><strong>{{ plan.request.provider_name }}</strong><span>proveedor</span></div>
+        <div class="metrics" aria-label="{% trans 'Resumen del plan' %}">
+            <div><strong>{{ plan.metrics.department_count }}</strong><span>{% trans "áreas" %}</span></div>
+            <div><strong>{{ plan.metrics.vacancy_count }}</strong><span>{% trans "tipos de vacante" %}</span></div>
+            <div><strong>{{ plan.metrics.total_positions }}</strong><span>{% trans "puestos sugeridos" %}</span></div>
+            <div><strong>{{ plan.provider_name }}</strong><span>{% trans "proveedor" %}</span></div>
         </div>
     </div>
 </section>
@@ -30,36 +34,63 @@
 <div class="container plan-layout">
     <section class="main-column" aria-labelledby="structure-title">
         <div class="section-heading">
-            <div><p class="overline">Organigrama</p><h2 id="structure-title">Estructura propuesta</h2></div>
-            <span class="muted">Las lineas representan relaciones de reporte.</span>
+            <div><p class="overline">{% trans "Organigrama" %}</p><h2 id="structure-title">{% trans "Estructura propuesta" %}</h2></div>
+            <span class="muted">{% trans "Las líneas representan relaciones de reporte." %}</span>
         </div>
         <div class="org-chart">
-            {% for unit in root_units %}
-                {% include "organization/_unit_tree.html" with unit=unit only %}
+            {% for node in page.root_units %}
+                {% include "organization/_unit_tree.html" with node=node only %}
             {% empty %}
-                <p>No hay unidades en este plan.</p>
+                <p>{% trans "No hay unidades en este plan." %}</p>
             {% endfor %}
         </div>
     </section>
 
-    <aside class="side-column" aria-label="Supuestos y advertencias">
+    <aside class="side-column" aria-label="{% trans 'Acciones, supuestos y advertencias' %}">
+        <section class="aside-card" aria-labelledby="report-title">
+            <p class="overline">{% trans "Procesamiento en segundo plano" %}</p>
+            <h2 id="report-title">{% trans "Exportar reporte" %}</h2>
+            <p class="muted">{% trans "El reporte se genera de forma asíncrona y puedes seguir navegando mientras tanto." %}</p>
+            <form method="post" action="{% url 'organization:request-report' plan.id %}">
+                {% csrf_token %}
+                <fieldset class="radio-group">
+                    <legend>{{ report_form.format.label }}</legend>
+                    {% for choice in report_form.format %}
+                        <label class="radio-option">{{ choice.tag }} {{ choice.choice_label }}</label>
+                    {% endfor %}
+                </fieldset>
+                <button class="button button-primary button-wide" type="submit">{% trans "Generar reporte" %}</button>
+            </form>
+        </section>
         <section class="aside-card">
-            <p class="overline">Transparencia</p>
-            <h2>Supuestos utilizados</h2>
+            <p class="overline">{% trans "Conversión de salarios" %}</p>
+            {% if page.conversion %}
+                <p class="muted">
+                    {% blocktrans with provider=page.conversion.provider %}Valores en USD calculados con tasas de {{ provider }}.{% endblocktrans %}
+                    {% if page.conversion.stale %}<strong>{% trans "Las tasas pueden estar desactualizadas." %}</strong>{% endif %}
+                </p>
+            {% else %}
+                <p class="muted">{% trans "La conversión a USD no está disponible en este momento. Los salarios se muestran en su moneda original." %}</p>
+            {% endif %}
+        </section>
+        <section class="aside-card">
+            <p class="overline">{% trans "Transparencia" %}</p>
+            <h2>{% trans "Supuestos utilizados" %}</h2>
             <ul class="assumption-list">
                 {% for assumption in plan.assumptions %}
                     <li>{{ assumption }}</li>
                 {% empty %}
-                    <li>No se registraron supuestos.</li>
+                    <li>{% trans "No se registraron supuestos." %}</li>
                 {% endfor %}
             </ul>
         </section>
         <section class="aside-card warning-card">
             <span class="warning-icon" aria-hidden="true">!</span>
-            <h2>Revision obligatoria</h2>
-            <p>Los salarios son aproximaciones. Valida mercado, legislacion, presupuesto y equidad antes de publicar.</p>
+            <h2>{% trans "Revisión obligatoria" %}</h2>
+            <p>{% trans "Los salarios son aproximaciones. Valida mercado, legislación, presupuesto y equidad antes de publicar." %}</p>
         </section>
-        <a class="button button-secondary button-wide" href="{% url 'organization:generate' %}">Crear otro plan</a>
+        <a class="button button-secondary button-wide" href="{% url 'organization:generate' %}">{% trans "Crear otro plan" %}</a>
     </aside>
 </div>
+{% endwith %}
 {% endblock %}

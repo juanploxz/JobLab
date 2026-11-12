@@ -44,6 +44,6 @@ jobs:
           python-version: "3.12"
           cache: pip
       - name: Install dependencies
-        run: python -m pip install -r requirements.txt
+        run: python -m pip install -r requirements.txt fakeredis
       - name: Run tests
         run: python -m unittest discover -s tests -t . -v
