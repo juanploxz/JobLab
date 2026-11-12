@@ -1,34 +1,39 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Crear estructura | JobLab{% endblock %}
+{% block title %}{% trans "Crear estructura" %} | JobLab{% endblock %}
 
 {% block content %}
 <section class="hero">
     <div class="container hero-grid">
         <div class="hero-copy">
-            <span class="eyebrow">Planeacion organizacional asistida</span>
-            <h1>Convierte tu idea en un equipo que tenga sentido.</h1>
+            <span class="eyebrow">{% trans "Planeación organizacional asistida" %}</span>
+            <h1>{% trans "Convierte tu idea en un equipo que tenga sentido." %}</h1>
             <p class="hero-lead">
-                Describe la empresa que quieres construir. JobLab propondra areas,
-                relaciones de reporte y vacantes editables para iniciar la conversacion.
+                {% blocktrans trimmed %}
+                Describe la empresa que quieres construir. JobLab propondrá áreas,
+                relaciones de reporte y vacantes editables para iniciar la conversación.
+                {% endblocktrans %}
             </p>
-            <ul class="feature-list" aria-label="Beneficios">
-                <li><span aria-hidden="true">01</span> Estructura jerarquica coherente</li>
-                <li><span aria-hidden="true">02</span> Puestos, cantidad y conocimientos</li>
-                <li><span aria-hidden="true">03</span> Rangos salariales identificados como estimaciones</li>
+            <ul class="feature-list" aria-label="{% trans 'Beneficios' %}">
+                <li><span aria-hidden="true">01</span> {% trans "Estructura jerárquica coherente" %}</li>
+                <li><span aria-hidden="true">02</span> {% trans "Puestos, cantidad y conocimientos" %}</li>
+                <li><span aria-hidden="true">03</span> {% trans "Rangos salariales identificados como estimaciones" %}</li>
             </ul>
         </div>
 
         <div class="form-panel">
             <div class="panel-heading">
                 <div>
-                    <p class="overline">Nueva generacion</p>
-                    <h2>Contexto de la empresa</h2>
+                    <p class="overline">{% trans "Nueva generación" %}</p>
+                    <h2>{% trans "Contexto de la empresa" %}</h2>
                 </div>
-                <span class="provider-badge">Proveedor: {{ provider_name }}</span>
+                <span class="provider-badge">{% blocktrans %}Proveedor: {{ provider_name }}{% endblocktrans %}</span>
             </div>
 
-            <form method="post" novalidate data-generation-form>
+            <form method="post" novalidate data-generation-form
+                  data-loading-label="{% trans 'Generando plan...' %}"
+                  data-min-error="{% blocktrans with minimum=form.company_description.field.min_length %}Escribe al menos {{ minimum }} caracteres para continuar.{% endblocktrans %}">
                 {% csrf_token %}
                 {% if form.non_field_errors %}
                     <div class="alert alert-error" role="alert">
@@ -38,27 +43,25 @@
 
                 <div class="form-field{% if form.company_description.errors %} has-error{% endif %}">
                     <label for="{{ form.company_description.id_for_label }}">
-                        {{ form.company_description.label }}
+                        {{ form.company_description.label }} <span class="required-mark" aria-hidden="true">*</span>
                     </label>
                     {{ form.company_description }}
                     <div class="field-meta">
                         <span id="company-description-counter" aria-live="polite">0 / 5000</span>
-                        <span>Minimo 80 caracteres</span>
+                        <span>{% blocktrans with minimum=form.company_description.field.min_length %}Mínimo {{ minimum }} caracteres{% endblocktrans %}</span>
                     </div>
-                    {% if form.company_description.errors %}
-                        <div class="field-errors" role="alert">{{ form.company_description.errors }}</div>
-                    {% endif %}
+                    <div class="field-errors" role="alert" data-client-error>{% if form.company_description.errors %}{{ form.company_description.errors }}{% endif %}</div>
                     <small id="company-description-help" class="help-text">
                         {{ form.company_description.help_text }}
                     </small>
                 </div>
 
                 <button class="button button-primary button-wide" type="submit">
-                    <span data-button-label>Generar estructura</span>
+                    <span data-button-label>{% trans "Generar estructura" %}</span>
                     <span class="button-arrow" aria-hidden="true">&rarr;</span>
                 </button>
                 <p class="privacy-note">
-                    No incluyas nombres, documentos, credenciales ni informacion confidencial.
+                    {% trans "No incluyas nombres, documentos, credenciales ni información confidencial." %}
                 </p>
             </form>
         </div>
@@ -67,12 +70,12 @@
 
 <section class="process-section" aria-labelledby="process-title">
     <div class="container">
-        <p class="overline">Como funciona</p>
-        <h2 id="process-title">De descripcion a plan en tres pasos</h2>
+        <p class="overline">{% trans "Cómo funciona" %}</p>
+        <h2 id="process-title">{% trans "De descripción a plan en tres pasos" %}</h2>
         <div class="process-grid">
-            <article><span>1</span><h3>Describe</h3><p>Incluye capacidades, mercado, ubicacion, presupuesto y objetivos.</p></article>
-            <article><span>2</span><h3>Genera</h3><p>La IA propone una jerarquia y vacantes bajo un esquema estricto.</p></article>
-            <article><span>3</span><h3>Revisa</h3><p>El resultado queda como borrador, con supuestos y salarios visibles.</p></article>
+            <article><span>1</span><h3>{% trans "Describe" %}</h3><p>{% trans "Incluye capacidades, mercado, ubicación, presupuesto y objetivos." %}</p></article>
+            <article><span>2</span><h3>{% trans "Genera" %}</h3><p>{% trans "La IA propone una jerarquía y vacantes bajo un esquema estricto." %}</p></article>
+            <article><span>3</span><h3>{% trans "Revisa" %}</h3><p>{% trans "El resultado queda como borrador, con supuestos y salarios visibles." %}</p></article>
         </div>
     </div>
 </section>

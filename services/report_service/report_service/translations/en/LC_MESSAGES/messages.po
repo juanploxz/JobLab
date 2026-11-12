@@ -1,0 +1,111 @@
+# English catalog of the JobLab report microservice.
+msgid ""
+msgstr ""
+"Project-Id-Version: joblab-report-service 2.0\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Reporte de plan organizacional"
+msgstr "Organizational plan report"
+
+msgid "Plan"
+msgstr "Plan"
+
+msgid "Generado"
+msgstr "Generated"
+
+msgid "Áreas"
+msgstr "Areas"
+
+msgid "Tipos de vacante"
+msgstr "Vacancy types"
+
+msgid "Puestos sugeridos"
+msgstr "Suggested positions"
+
+msgid "Departamento"
+msgstr "Department"
+
+msgid "Vacante"
+msgstr "Vacancy"
+
+msgid "Puestos"
+msgstr "Positions"
+
+msgid "Salario mínimo"
+msgstr "Minimum salary"
+
+msgid "Salario máximo"
+msgstr "Maximum salary"
+
+msgid "Moneda"
+msgstr "Currency"
+
+msgid "Periodicidad"
+msgstr "Period"
+
+msgid "Salario mínimo (USD)"
+msgstr "Minimum salary (USD)"
+
+msgid "Salario máximo (USD)"
+msgstr "Maximum salary (USD)"
+
+msgid "Conocimientos"
+msgstr "Knowledge"
+
+msgid "Reporta a"
+msgstr "Reports to"
+
+msgid "El cuerpo JSON está mal formado."
+msgstr "The JSON body is malformed."
+
+msgid "plan_id debe ser un entero positivo."
+msgstr "plan_id must be a positive integer."
+
+msgid "format debe ser uno de: %(options)s."
+msgstr "format must be one of: %(options)s."
+
+msgid "El servicio de colas no está disponible."
+msgstr "The queue service is not available."
+
+msgid "El plan solicitado no existe."
+msgstr "The requested plan does not exist."
+
+msgid "No fue posible generar el reporte."
+msgstr "The report could not be generated."
+
+msgid "No existe un reporte con ese identificador."
+msgstr "There is no report with that identifier."
+
+msgid "El reporte todavía no está listo."
+msgstr "The report is not ready yet."
+
+msgid "El registro de notificaciones no está disponible."
+msgstr "The notification log is not available."
+
+msgid "Recurso no encontrado."
+msgstr "Resource not found."
+
+msgid "Método no permitido para este recurso."
+msgstr "Method not allowed for this resource."
+
+msgid "La solicitud no pudo ser procesada."
+msgstr "The request could not be processed."
+
+msgid "El microservicio no pudo procesar la solicitud."
+msgstr "The microservice could not process the request."
+
+msgid "JobLab: nuevo plan organizacional"
+msgstr "JobLab: new organizational plan"
+
+msgid "Se generó el plan %(plan_id)s para %(company_name)s con %(vacancy_count)s vacantes y %(total_positions)s puestos sugeridos."
+msgstr "Plan %(plan_id)s was generated for %(company_name)s with %(vacancy_count)s vacancies and %(total_positions)s suggested positions."
+
+msgid "JobLab: nueva vacante"
+msgstr "JobLab: new vacancy"
+
+msgid "Se creó la vacante %(vacancy_name)s en el plan %(plan_id)s."
+msgstr "The vacancy %(vacancy_name)s was created in plan %(plan_id)s."

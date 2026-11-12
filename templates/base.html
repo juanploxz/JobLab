@@ -1,37 +1,64 @@
-{% load static %}
-<!doctype html>
-<html lang="es">
+{% load static i18n %}{% get_current_language as LANGUAGE_CODE %}{% get_available_languages as LANGUAGES %}<!doctype html>
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="JobLab genera estructuras organizacionales y borradores de vacantes con IA.">
+    <meta name="description" content="{% trans 'JobLab genera estructuras organizacionales y borradores de vacantes con IA.' %}">
     <title>{% block title %}JobLab{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'organization/styles.css' %}">
     <script src="{% static 'organization/app.js' %}" defer></script>
+    {% block head %}{% endblock %}
 </head>
 <body>
-    <a class="skip-link" href="#main-content">Saltar al contenido</a>
+    <a class="skip-link" href="#main-content">{% trans "Saltar al contenido" %}</a>
+    {% with current=request.resolver_match.url_name %}
     <header class="site-header">
-        <nav class="nav container" aria-label="Navegacion principal">
-            <a class="brand" href="{% url 'organization:generate' %}" aria-label="JobLab, inicio">
+        <nav class="nav container" aria-label="{% trans 'Navegación principal' %}">
+            <a class="brand" href="{% url 'organization:generate' %}" aria-label="{% trans 'JobLab, inicio' %}">
                 <span class="brand-mark" aria-hidden="true">JL</span>
                 <span>JobLab</span>
             </a>
-            <div class="nav-links">
-                <a href="{% url 'organization:generate' %}">Crear estructura</a>
-                <a href="{% url 'organization:history' %}">Historial</a>
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-links" data-nav-toggle>
+                <span class="visually-hidden">{% trans "Abrir menú" %}</span><span aria-hidden="true">&#9776;</span>
+            </button>
+            <div class="nav-links" id="primary-links">
+                <a href="{% url 'organization:generate' %}" {% if current == 'generate' %}aria-current="page"{% endif %}>{% trans "Crear estructura" %}</a>
+                <a href="{% url 'organization:history' %}" {% if current == 'history' or current == 'detail' %}aria-current="page"{% endif %}>{% trans "Historial" %}</a>
+                <a href="{% url 'organization:ally' %}" {% if current == 'ally' %}aria-current="page"{% endif %}>{% trans "Aliados" %}</a>
+                <a href="{% url 'organization:activity' %}" {% if current == 'activity' %}aria-current="page"{% endif %}>{% trans "Actividad" %}</a>
+                <a href="{% url 'organization:status' %}" {% if current == 'status' %}aria-current="page"{% endif %}>{% trans "Estado" %}</a>
+                <form class="language-form" action="{% url 'set_language' %}" method="post">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                    <label class="visually-hidden" for="language-select">{% trans "Idioma" %}</label>
+                    <select id="language-select" name="language" data-auto-submit>
+                        {% for code, name in LANGUAGES %}
+                            <option value="{{ code }}" {% if code == LANGUAGE_CODE %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                    <noscript><button class="button button-secondary button-small" type="submit">{% trans "Cambiar" %}</button></noscript>
+                </form>
             </div>
         </nav>
     </header>
+    {% endwith %}
 
-    <main id="main-content">
+    {% if messages %}
+        <div class="container flash-messages" role="status" aria-live="polite">
+            {% for message in messages %}
+                <p class="flash flash-{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main id="main-content" tabindex="-1">
         {% block content %}{% endblock %}
     </main>
 
     <footer class="site-footer">
         <div class="container footer-content">
-            <p><strong>JobLab</strong> convierte una idea de negocio en un primer plan de equipo.</p>
-            <p>Todo resultado generado por IA requiere revision humana.</p>
+            <p><strong>JobLab</strong> {% trans "convierte una idea de negocio en un primer plan de equipo." %}</p>
+            <p>{% trans "Todo resultado generado por IA requiere revisión humana." %}</p>
         </div>
     </footer>
 </body>

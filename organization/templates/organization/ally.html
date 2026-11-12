@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Aliados" %} | JobLab{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="section-heading history-heading">
+            <div>
+                <span class="eyebrow">{% trans "Integración entre equipos" %}</span>
+                <h1>{% trans "Servicio del equipo aliado" %}</h1>
+                <p>{% trans "Información publicada por el equipo aliado y consumida a través de integration-service mediante el patrón Adapter." %}</p>
+            </div>
+        </div>
+
+        {% if catalog %}
+            <p class="muted">
+                {% blocktrans with ally=catalog.ally count count=catalog.count %}{{ ally }}: {{ count }} registro.{% plural %}{{ ally }}: {{ count }} registros.{% endblocktrans %}
+                {% if catalog.stale %}<strong>{% trans "Mostrando la última copia disponible; el servicio aliado no respondió." %}</strong>{% endif %}
+            </p>
+            <div class="history-grid">
+                {% for item in catalog.items %}
+                    <article class="history-card">
+                        {% if item.subtitle %}<div class="history-meta"><span>{{ item.subtitle }}</span></div>{% endif %}
+                        <h2>{{ item.title }}</h2>
+                        {% if item.description %}<p>{{ item.description }}</p>{% endif %}
+                        {% if item.url %}<a class="history-link" href="{{ item.url }}" target="_blank" rel="noopener noreferrer">{% trans "Abrir en el sitio aliado" %} &rarr;</a>{% endif %}
+                    </article>
+                {% empty %}
+                    <div class="empty-state"><h2>{% trans "El aliado no publicó registros" %}</h2></div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                {% if not_configured %}
+                    <h2>{% trans "La integración con el equipo aliado aún no está configurada" %}</h2>
+                    <p>{% trans "Define ALLY_SERVICE_URL (y opcionalmente ALLY_ITEMS_PATH y los campos a mostrar) en integration-service." %}</p>
+                {% else %}
+                    <h2>{% trans "El servicio aliado no está disponible" %}</h2>
+                    <p>{% trans "La aplicación sigue funcionando; vuelve a intentarlo en unos minutos." %}</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

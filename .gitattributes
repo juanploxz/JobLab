@@ -1,0 +1,6 @@
+# Shell scripts and container configuration run on Linux: always check them out with LF.
+*.sh text eol=lf
+nginx.conf text eol=lf
+docker-compose.yml text eol=lf
+Dockerfile text eol=lf
+*.mo binary
