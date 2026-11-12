@@ -1,6 +1,7 @@
 import re
 
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext as _
 
 from organization.domain.exceptions import DomainValidationError
 
@@ -43,16 +44,18 @@ def validate_company_description(value: str) -> str:
     normalized = " ".join((value or "").split())
     if len(normalized) < MIN_DESCRIPTION_LENGTH:
         raise DomainValidationError(
-            f"Describe la empresa con al menos {MIN_DESCRIPTION_LENGTH} caracteres."
+            _("Describe la empresa con al menos %(minimum)s caracteres.") % {"minimum": MIN_DESCRIPTION_LENGTH}
         )
     if len(normalized) > MAX_DESCRIPTION_LENGTH:
         raise DomainValidationError(
-            f"La descripcion no puede superar {MAX_DESCRIPTION_LENGTH} caracteres."
+            _("La descripcion no puede superar %(maximum)s caracteres.") % {"maximum": MAX_DESCRIPTION_LENGTH}
         )
     if any(pattern.search(normalized) for pattern in _PROMPT_INJECTION_PATTERNS):
         raise DomainValidationError(
-            "La descripcion contiene instrucciones dirigidas al sistema. "
-            "Incluye solamente informacion sobre la empresa."
+            _(
+                "La descripcion contiene instrucciones dirigidas al sistema. "
+                "Incluye solamente informacion sobre la empresa."
+            )
         )
     return normalized
 
@@ -76,15 +79,15 @@ def _validate_string_list(
     require_unique: bool = False,
 ) -> None:
     if not isinstance(value, list):
-        raise ValidationError(f"{label} debe ser una lista.", code="invalid_list")
+        raise ValidationError(_("%(label)s debe ser una lista.") % {"label": label}, code="invalid_list")
     if not allow_empty and not value:
         raise ValidationError(
-            f"{label} debe contener al menos un elemento.",
+            _("%(label)s debe contener al menos un elemento.") % {"label": label},
             code="empty_list",
         )
     if len(value) > max_items:
         raise ValidationError(
-            f"{label} no puede contener mas de {max_items} elementos.",
+            _("%(label)s no puede contener mas de %(maximum)s elementos.") % {"label": label, "maximum": max_items},
             code="too_many_items",
         )
 
@@ -92,20 +95,20 @@ def _validate_string_list(
     for item in value:
         if not isinstance(item, str):
             raise ValidationError(
-                f"Cada elemento de {label.lower()} debe ser texto.",
+                _("Cada elemento de %(label)s debe ser texto.") % {"label": label.lower()},
                 code="invalid_item_type",
             )
         normalized = " ".join(item.split())
         if not min_item_length <= len(normalized) <= max_item_length:
             raise ValidationError(
-                f"Cada elemento de {label.lower()} debe tener entre "
-                f"{min_item_length} y {max_item_length} caracteres.",
+                _("Cada elemento de %(label)s debe tener entre %(minimum)s y %(maximum)s caracteres.")
+                % {"label": label.lower(), "minimum": min_item_length, "maximum": max_item_length},
                 code="invalid_item_length",
             )
         key = normalized.casefold()
         if require_unique and key in seen:
             raise ValidationError(
-                f"{label} no puede contener elementos duplicados.",
+                _("%(label)s no puede contener elementos duplicados.") % {"label": label},
                 code="duplicate_items",
             )
         seen.add(key)
@@ -114,7 +117,7 @@ def _validate_string_list(
 def validate_assumptions(value: object) -> None:
     _validate_string_list(
         value,
-        label="Supuestos",
+        label=_("Supuestos"),
         allow_empty=True,
         max_items=MAX_ASSUMPTIONS,
         min_item_length=MIN_ASSUMPTION_LENGTH,
@@ -125,7 +128,7 @@ def validate_assumptions(value: object) -> None:
 def validate_required_knowledge(value: object) -> None:
     _validate_string_list(
         value,
-        label="Conocimientos requeridos",
+        label=_("Conocimientos requeridos"),
         allow_empty=False,
         max_items=MAX_REQUIRED_KNOWLEDGE,
         min_item_length=MIN_KNOWLEDGE_LENGTH,
