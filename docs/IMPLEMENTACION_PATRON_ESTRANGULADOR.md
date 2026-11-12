@@ -6,6 +6,14 @@ Este documento describe la implementación del patrón Strangler en JobLab para
 el Taller 02. Es una página independiente de la documentación de la Entrega 1:
 no reemplaza ni modifica el contenido de `ENTREGABLE_1.md`.
 
+> **Evolución en la Entrega 2.** El prototipo `microservice/` descrito aquí se
+> trasladó a `services/plan_service/`. Ahora tiene persistencia propia, el
+> dominio completo y el mismo contrato de la API v1. El endpoint
+> `/api/v2/organizational-plan/` se conserva, pero genera la propuesta con el
+> dominio real en lugar de reglas por palabras clave. Las rutas y comandos de
+> este documento corresponden al estado del Taller 02. El estado actual está en
+> [ENTREGABLE_2.md](ENTREGABLE_2.md).
+
 JobLab conserva su aplicación monolítica Django y extrae de forma gradual una
 capacidad de negocio a un microservicio Flask. Nginx actúa como punto de entrada
 y dirige las solicitudes según la ruta. La implementación demuestra la
