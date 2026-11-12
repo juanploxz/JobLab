@@ -6,6 +6,7 @@ from django.core.validators import (
 )
 from django.db import models
 from django.db.models.functions import Lower
+from django.utils.translation import gettext_lazy as _
 
 from organization.domain.validators import (
     MAX_AVAILABLE_POSITIONS,
@@ -27,10 +28,10 @@ from organization.domain.validators import (
 
 class OrganizationGenerationRequest(models.Model):
     class Status(models.TextChoices):
-        PENDING = "PENDING", "Pendiente"
-        PROCESSING = "PROCESSING", "Procesando"
-        COMPLETED = "COMPLETED", "Completada"
-        FAILED = "FAILED", "Fallida"
+        PENDING = "PENDING", _("Pendiente")
+        PROCESSING = "PROCESSING", _("Procesando")
+        COMPLETED = "COMPLETED", _("Completada")
+        FAILED = "FAILED", _("Fallida")
 
     company_description = models.TextField(
         max_length=5000,
@@ -47,14 +48,14 @@ class OrganizationGenerationRequest(models.Model):
         ordering = ("-created_at",)
 
     def __str__(self) -> str:
-        return f"Solicitud #{self.pk} ({self.get_status_display()})"
+        return _("Solicitud #%(id)s (%(status)s)") % {"id": self.pk, "status": self.get_status_display()}
 
 
 class OrganizationalPlan(models.Model):
     class ReviewStatus(models.TextChoices):
-        DRAFT = "DRAFT", "Borrador para revision"
-        REVIEWED = "REVIEWED", "Revisado"
-        APPROVED = "APPROVED", "Aprobado"
+        DRAFT = "DRAFT", _("Borrador para revision")
+        REVIEWED = "REVIEWED", _("Revisado")
+        APPROVED = "APPROVED", _("Aprobado")
 
     request = models.OneToOneField(
         OrganizationGenerationRequest,
@@ -96,7 +97,7 @@ class OrganizationalUnit(models.Model):
             MinLengthValidator(2),
             RegexValidator(
                 regex=r"^[A-Z][A-Z0-9_]*$",
-                message="El codigo debe usar mayusculas, numeros o guiones bajos.",
+                message=_("El codigo debe usar mayusculas, numeros o guiones bajos."),
             ),
         ],
     )
@@ -146,14 +147,14 @@ class Vacancy(models.Model):
         MXN = "MXN", "MXN"
 
     class SalaryPeriod(models.TextChoices):
-        HOURLY = "HOURLY", "Por hora"
-        MONTHLY = "MONTHLY", "Mensual"
-        ANNUAL = "ANNUAL", "Anual"
+        HOURLY = "HOURLY", _("Por hora")
+        MONTHLY = "MONTHLY", _("Mensual")
+        ANNUAL = "ANNUAL", _("Anual")
 
     class Status(models.TextChoices):
-        DRAFT = "DRAFT", "Borrador"
-        PUBLISHED = "PUBLISHED", "Publicada"
-        CLOSED = "CLOSED", "Cerrada"
+        DRAFT = "DRAFT", _("Borrador")
+        PUBLISHED = "PUBLISHED", _("Publicada")
+        CLOSED = "CLOSED", _("Cerrada")
 
     plan = models.ForeignKey(
         OrganizationalPlan,

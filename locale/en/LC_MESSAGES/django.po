@@ -1,0 +1,694 @@
+# English translations for JobLab.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the JobLab project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: JobLab 2.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-11-12 15:19-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#, python-format
+msgid "%(ally)s: %(count)s registro."
+msgid_plural "%(ally)s: %(count)s registros."
+msgstr[0] "%(ally)s: %(count)s record."
+msgstr[1] "%(ally)s: %(count)s records."
+
+#, python-format
+msgid "%(counter)s plan registrado."
+msgid_plural "%(counter)s planes registrados."
+msgstr[0] "%(counter)s registered plan."
+msgstr[1] "%(counter)s registered plans."
+
+#, python-format
+msgid "%(counter)s puesto"
+msgid_plural "%(counter)s puestos"
+msgstr[0] "%(counter)s position"
+msgstr[1] "%(counter)s positions"
+
+#, python-format
+msgid "%(counter)s vacante"
+msgid_plural "%(counter)s vacantes"
+msgstr[0] "%(counter)s vacancy"
+msgstr[1] "%(counter)s vacancies"
+
+#, python-format
+msgid "%(label)s debe contener al menos un elemento."
+msgstr "%(label)s must contain at least one item."
+
+#, python-format
+msgid "%(label)s debe ser una lista."
+msgstr "%(label)s must be a list."
+
+#, python-format
+msgid "%(label)s no puede contener elementos duplicados."
+msgstr "%(label)s cannot contain duplicated items."
+
+#, python-format
+msgid "%(label)s no puede contener mas de %(maximum)s elementos."
+msgstr "%(label)s cannot contain more than %(maximum)s items."
+
+msgid "Abrir en el sitio aliado"
+msgstr "Open on the allied site"
+
+msgid "Abrir menú"
+msgstr "Open menu"
+
+msgid "Acciones, supuestos y advertencias"
+msgstr "Actions, assumptions and warnings"
+
+msgid "Actividad"
+msgstr "Activity"
+
+msgid "Actividad reciente"
+msgstr "Recent activity"
+
+msgid "Actualizar ahora"
+msgstr "Refresh now"
+
+msgid "Algo salió mal"
+msgstr "Something went wrong"
+
+msgid "Aliados"
+msgstr "Allies"
+
+msgid "Anterior"
+msgstr "Previous"
+
+msgid "Anual"
+msgstr "Annual"
+
+msgid "Aprobado"
+msgstr "Approved"
+
+msgid "Aún no hay planes"
+msgstr "There are no plans yet"
+
+msgid "Beneficios"
+msgstr "Benefits"
+
+msgid "Borrador"
+msgstr "Draft"
+
+msgid "Borrador para revision"
+msgstr "Draft for review"
+
+msgid "CSV (Excel)"
+msgstr "CSV (Excel)"
+
+#, python-format
+msgid "Cada conocimiento debe tener entre %(minimum)s y %(maximum)s caracteres"
+msgstr "Each knowledge item must have between %(minimum)s and %(maximum)s characters"
+
+msgid "Cada conocimiento requerido debe ser texto"
+msgstr "Each required knowledge item must be text"
+
+#, python-format
+msgid "Cada elemento de %(label)s debe ser texto."
+msgstr "Each item of %(label)s must be text."
+
+#, python-format
+msgid "Cada elemento de %(label)s debe tener entre %(minimum)s y %(maximum)s caracteres."
+msgstr "Each item of %(label)s must have between %(minimum)s and %(maximum)s characters."
+
+msgid "Cambiar"
+msgstr "Change"
+
+msgid "Cerrada"
+msgstr "Closed"
+
+msgid "Completada"
+msgstr "Completed"
+
+msgid "Conocimientos requeridos"
+msgstr "Required knowledge"
+
+msgid "Contexto de la empresa"
+msgstr "Company context"
+
+msgid "Conversión de salarios"
+msgstr "Salary conversion"
+
+msgid "Convierte tu idea en un equipo que tenga sentido."
+msgstr "Turn your idea into a team that makes sense."
+
+msgid "Crea el primero a partir de la descripción de una empresa."
+msgstr "Create the first one from a company description."
+
+msgid "Crear estructura"
+msgstr "Create structure"
+
+msgid "Crear otro plan"
+msgstr "Create another plan"
+
+msgid "Cómo funciona"
+msgstr "How it works"
+
+msgid "De descripción a plan en tres pasos"
+msgstr "From description to plan in three steps"
+
+msgid "Debe existir al menos un conocimiento requerido"
+msgstr "At least one required knowledge item is needed"
+
+msgid "Define ALLY_SERVICE_URL (y opcionalmente ALLY_ITEMS_PATH y los campos a mostrar) en integration-service."
+msgstr "Set ALLY_SERVICE_URL (and optionally ALLY_ITEMS_PATH and the fields to display) in integration-service."
+
+msgid "Descargar"
+msgstr "Download"
+
+msgid "Descargar reporte"
+msgstr "Download report"
+
+msgid "Describe"
+msgstr "Describe"
+
+#, python-format
+msgid "Describe la empresa con al menos %(limit_value)d caracteres."
+msgstr "Describe the company with at least %(limit_value)d characters."
+
+#, python-format
+msgid "Describe la empresa con al menos %(minimum)s caracteres."
+msgstr "Describe the company with at least %(minimum)s characters."
+
+msgid "Describe la empresa que quieres construir. JobLab propondrá áreas, relaciones de reporte y vacantes editables para iniciar la conversación."
+msgstr "Describe the company you want to build. JobLab will propose areas, reporting lines and editable vacancies to start the conversation."
+
+msgid "Describe tu empresa"
+msgstr "Describe your company"
+
+msgid "Detalles"
+msgstr "Details"
+
+msgid "Ejemplo: Somos una empresa de software en Medellin que creara una plataforma para pequenas tiendas. Contamos con..."
+msgstr "Example: We are a software company in Medellin building a platform for small shops. We have..."
+
+msgid "El aliado no publicó registros"
+msgstr "The ally has not published any records"
+
+msgid "El codigo debe usar mayusculas, numeros o guiones bajos."
+msgstr "The code must use uppercase letters, numbers or underscores."
+
+msgid "El departamento indicado no es valido"
+msgstr "The given department is not valid"
+
+msgid "El departamento indicado no existe dentro del plan."
+msgstr "The given department does not exist in the plan."
+
+msgid "El departamento no pertenece al plan indicado"
+msgstr "The department does not belong to the given plan"
+
+#, python-format
+msgid "El microservicio %(service)s no respondió a tiempo. El resto de JobLab sigue funcionando; intenta de nuevo en unos segundos."
+msgstr "The %(service)s microservice did not answer in time. The rest of JobLab keeps working; try again in a few seconds."
+
+msgid "El nombre de la vacante debe ser texto"
+msgstr "The vacancy name must be text"
+
+msgid "El nombre de la vacante es demasiado corto"
+msgstr "The vacancy name is too short"
+
+msgid "El plan indicado no es valido"
+msgstr "The given plan is not valid"
+
+msgid "El plan se generó correctamente."
+msgstr "The plan was generated successfully."
+
+msgid "El recurso que buscas no existe o fue eliminado."
+msgstr "The resource you are looking for does not exist or was removed."
+
+#, python-format
+msgid "El reporte %(fmt)s del plan #%(plan_id)s está listo."
+msgstr "The %(fmt)s report of plan #%(plan_id)s is ready."
+
+msgid "El reporte se genera de forma asíncrona y puedes seguir navegando mientras tanto."
+msgstr "The report is generated asynchronously; you can keep browsing meanwhile."
+
+msgid "El reporte se generó correctamente."
+msgstr "The report was generated successfully."
+
+msgid "El reporte todavía no está disponible."
+msgstr "The report is not available yet."
+
+msgid "El resultado queda como borrador, con supuestos y salarios visibles."
+msgstr "The result is saved as a draft, with visible assumptions and salaries."
+
+msgid "El rol de reporte debe ser texto"
+msgstr "The reporting role must be text"
+
+msgid "El salario debe ser numerico"
+msgstr "The salary must be numeric"
+
+msgid "El salario debe ser un numero finito"
+msgstr "The salary must be a finite number"
+
+msgid "El salario minimo no puede ser negativo"
+msgstr "The minimum salary cannot be negative"
+
+msgid "El salario minimo no puede superar el maximo"
+msgstr "The minimum salary cannot exceed the maximum"
+
+msgid "El servicio aliado no está disponible"
+msgstr "The allied service is not available"
+
+msgid "El servicio de generacion no esta disponible en este momento."
+msgstr "The generation service is not available right now."
+
+msgid "El servicio de generación no está disponible. Intenta nuevamente más tarde."
+msgstr "The generation service is not available. Please try again later."
+
+msgid "El servicio de notificaciones no está disponible"
+msgstr "The notification service is not available"
+
+msgid "El servicio de reportes no está disponible. Intenta nuevamente en unos minutos."
+msgstr "The report service is not available. Try again in a few minutes."
+
+msgid "En proceso"
+msgstr "In progress"
+
+msgid "Equivalente USD"
+msgstr "USD equivalent"
+
+msgid "Error interno"
+msgstr "Internal error"
+
+#, python-format
+msgid "Escribe al menos %(minimum)s caracteres para continuar."
+msgstr "Write at least %(minimum)s characters to continue."
+
+msgid "Estado"
+msgstr "Status"
+
+msgid "Estado del ecosistema"
+msgstr "Ecosystem status"
+
+msgid "Estado del reporte"
+msgstr "Report status"
+
+msgid "Estado técnico"
+msgstr "Technical state"
+
+msgid "Estructura jerárquica coherente"
+msgstr "Coherent hierarchical structure"
+
+msgid "Estructura propuesta"
+msgstr "Proposed structure"
+
+msgid "Eventos asíncronos"
+msgstr "Asynchronous events"
+
+msgid "Exportar reporte"
+msgstr "Export report"
+
+msgid "Fallida"
+msgstr "Failed"
+
+msgid "Falló"
+msgstr "Failed"
+
+#, python-format
+msgid "Faltan campos obligatorios: %(fields)s"
+msgstr "Required fields are missing: %(fields)s"
+
+msgid "Formato"
+msgstr "Format"
+
+msgid "Formato del reporte"
+msgstr "Report format"
+
+msgid "Genera"
+msgstr "Generate"
+
+msgid "Generando plan..."
+msgstr "Generating plan..."
+
+msgid "Generar estructura"
+msgstr "Generate structure"
+
+msgid "Generar reporte"
+msgstr "Generate report"
+
+msgid "Historial"
+msgstr "History"
+
+msgid "Identificador"
+msgstr "Identifier"
+
+msgid "Idioma"
+msgstr "Language"
+
+msgid "Incluye capacidades, mercado, ubicación, presupuesto y objetivos."
+msgstr "Include capabilities, market, location, budget and goals."
+
+msgid "Información publicada por el equipo aliado y consumida a través de integration-service mediante el patrón Adapter."
+msgstr "Information published by the allied team and consumed through integration-service with the Adapter pattern."
+
+msgid "Integración entre equipos"
+msgstr "Team integration"
+
+msgid "Ir al inicio"
+msgstr "Go to home"
+
+msgid "JSON"
+msgstr "JSON"
+
+msgid "JobLab genera estructuras organizacionales y borradores de vacantes con IA."
+msgstr "JobLab generates organizational structures and draft vacancies with AI."
+
+msgid "JobLab, inicio"
+msgstr "JobLab, home"
+
+msgid "La IA propone una jerarquía y vacantes bajo un esquema estricto."
+msgstr "The AI proposes a hierarchy and vacancies under a strict schema."
+
+msgid "La aplicación sigue funcionando; vuelve a intentarlo en unos minutos."
+msgstr "The application keeps working; try again in a few minutes."
+
+#, python-format
+msgid "La cantidad de puestos debe estar entre %(minimum)s y %(maximum)s"
+msgstr "The number of positions must be between %(minimum)s and %(maximum)s"
+
+msgid "La cantidad de puestos debe ser un numero entero"
+msgstr "The number of positions must be an integer"
+
+msgid "La conversión a USD no está disponible en este momento. Los salarios se muestran en su moneda original."
+msgstr "USD conversion is not available right now. Salaries are shown in their original currency."
+
+msgid "La descripcion contiene instrucciones dirigidas al sistema. Incluye solamente informacion sobre la empresa."
+msgstr "The description contains instructions aimed at the system. Include only information about the company."
+
+msgid "La descripcion de la vacante debe ser texto"
+msgstr "The vacancy description must be text"
+
+#, python-format
+msgid "La descripcion de la vacante debe tener entre %(minimum)s y %(maximum)s caracteres"
+msgstr "The vacancy description must have between %(minimum)s and %(maximum)s characters"
+
+#, python-format
+msgid "La descripcion no puede superar %(maximum)s caracteres."
+msgstr "The description cannot exceed %(maximum)s characters."
+
+msgid "La descripción de la empresa es obligatoria."
+msgstr "The company description is required."
+
+#, python-format
+msgid "La descripción no puede superar %(limit_value)d caracteres."
+msgstr "The description cannot exceed %(limit_value)d characters."
+
+msgid "La integración con el equipo aliado aún no está configurada"
+msgstr "The integration with the allied team is not configured yet"
+
+msgid "La solicitud contiene datos invalidos."
+msgstr "The request contains invalid data."
+
+msgid "La solicitud no pudo ser procesada."
+msgstr "The request could not be processed."
+
+msgid "La vacante entra en conflicto con un registro existente."
+msgstr "The vacancy conflicts with an existing record."
+
+msgid "La vacante indicada no existe dentro del plan."
+msgstr "The given vacancy does not exist in the plan."
+
+#, python-format
+msgid "La vacante no supera la validacion del modelo: %(errors)s"
+msgstr "The vacancy does not pass model validation: %(errors)s"
+
+msgid "Las líneas representan relaciones de reporte."
+msgstr "Lines represent reporting relationships."
+
+msgid "Las tasas pueden estar desactualizadas."
+msgstr "Rates may be outdated."
+
+msgid "Latencia"
+msgstr "Latency"
+
+msgid "Listo"
+msgstr "Ready"
+
+msgid "Los conocimientos requeridos deben ser una lista"
+msgstr "The required knowledge must be a list"
+
+#, python-format
+msgid "Los planes se atienden actualmente desde: %(plan_backend)s."
+msgstr "Plans are currently served by: %(plan_backend)s."
+
+msgid "Los salarios son aproximaciones. Valida mercado, legislación, presupuesto y equidad antes de publicar."
+msgstr "Salaries are approximations. Validate market, legislation, budget and equity before publishing."
+
+msgid "Mensual"
+msgstr "Monthly"
+
+msgid "Mostrando la última copia disponible; el servicio aliado no respondió."
+msgstr "Showing the last available copy; the allied service did not answer."
+
+#, python-format
+msgid "Mínimo %(minimum)s caracteres"
+msgstr "Minimum %(minimum)s characters"
+
+msgid "Navegación principal"
+msgstr "Main navigation"
+
+msgid "No configurado"
+msgstr "Not configured"
+
+#, python-format
+msgid "No existe un plan organizacional con id %(plan_id)s."
+msgstr "There is no organizational plan with id %(plan_id)s."
+
+msgid "No existe un reporte con ese identificador."
+msgstr "There is no report with that identifier."
+
+msgid "No fue posible generar el reporte."
+msgstr "The report could not be generated."
+
+msgid "No fue posible generar la estructura. Revisa la configuracion del proveedor o intenta nuevamente."
+msgstr "The structure could not be generated. Check the provider configuration or try again."
+
+msgid "No hay unidades en este plan."
+msgstr "There are no units in this plan."
+
+msgid "No incluyas nombres, documentos, credenciales ni información confidencial."
+msgstr "Do not include names, IDs, credentials or confidential information."
+
+#, python-format
+msgid "No puede haber mas de %(maximum)s conocimientos requeridos"
+msgstr "There cannot be more than %(maximum)s required knowledge items"
+
+msgid "No se registraron supuestos."
+msgstr "No assumptions were recorded."
+
+msgid "Notificaciones producidas por el worker de Celery a partir de los eventos publicados en Redis."
+msgstr "Notifications produced by the Celery worker from the events published to Redis."
+
+msgid "Nueva estructura"
+msgstr "New structure"
+
+msgid "Nueva generación"
+msgstr "New generation"
+
+msgid "Observabilidad"
+msgstr "Observability"
+
+msgid "Ocurrió un error inesperado. El equipo fue notificado en los registros; intenta nuevamente."
+msgstr "An unexpected error occurred. It was recorded in the logs; please try again."
+
+msgid "Operativo"
+msgstr "Operational"
+
+msgid "Organigrama"
+msgstr "Org chart"
+
+msgid "Paginación"
+msgstr "Pagination"
+
+msgid "Para obtener una propuesta mas precisa, incluye el sector, los productos o servicios, los objetivos, la ubicacion, el tamano esperado y el presupuesto o capacidad de contratacion. No incluyas datos personales ni confidenciales. La estructura, las vacantes y los salarios seran estimaciones generadas por IA y deberan revisarse antes de su publicacion."
+msgstr "For a more accurate proposal, include the industry, products or services, goals, location, expected size and budget or hiring capacity. Do not include personal or confidential data. The structure, vacancies and salaries will be AI-generated estimates and must be reviewed before publishing."
+
+msgid "Pendiente"
+msgstr "Pending"
+
+#, python-format
+msgid "Plan #%(plan_id)s"
+msgstr "Plan #%(plan_id)s"
+
+msgid "Plan organizacional"
+msgstr "Organizational plan"
+
+msgid "Planeación organizacional asistida"
+msgstr "Assisted organizational planning"
+
+msgid "Planes generados"
+msgstr "Generated plans"
+
+msgid "Por hora"
+msgstr "Hourly"
+
+msgid "Procesamiento en segundo plano"
+msgstr "Background processing"
+
+msgid "Procesando"
+msgstr "Processing"
+
+#, python-format
+msgid "Proveedor: %(provider_name)s"
+msgstr "Provider: %(provider_name)s"
+
+msgid "Publicada"
+msgstr "Published"
+
+msgid "Puestos, cantidad y conocimientos"
+msgstr "Positions, headcount and knowledge"
+
+#, python-format
+msgid "Página %(number)s de %(total)s"
+msgstr "Page %(number)s of %(total)s"
+
+msgid "Página inválida."
+msgstr "Invalid page."
+
+msgid "Página no encontrada"
+msgstr "Page not found"
+
+msgid "Rango estimado"
+msgstr "Estimated range"
+
+msgid "Rangos salariales identificados como estimaciones"
+msgstr "Salary ranges flagged as estimates"
+
+msgid "Recurso no encontrado."
+msgstr "Resource not found."
+
+msgid "Reintentar"
+msgstr "Retry"
+
+msgid "Reporta a"
+msgstr "Reports to"
+
+msgid "Reporte"
+msgstr "Report"
+
+msgid "Resumen del plan"
+msgstr "Plan summary"
+
+msgid "Revisa"
+msgstr "Review"
+
+msgid "Revisado"
+msgstr "Reviewed"
+
+msgid "Revisión obligatoria"
+msgstr "Mandatory review"
+
+msgid "Ruta de navegación"
+msgstr "Breadcrumb"
+
+msgid "Saltar al contenido"
+msgstr "Skip to content"
+
+msgid "Salud de cada servicio"
+msgstr "Health of each service"
+
+#, python-format
+msgid "Se creó la vacante %(name)s en el plan #%(plan_id)s."
+msgstr "The vacancy %(name)s was created in plan #%(plan_id)s."
+
+#, python-format
+msgid "Se generó el plan #%(plan_id)s para %(company)s con %(vacancies)s tipos de vacante."
+msgstr "Plan #%(plan_id)s was generated for %(company)s with %(vacancies)s vacancy types."
+
+msgid "Selecciona un formato de reporte válido."
+msgstr "Select a valid report format."
+
+msgid "Servicio"
+msgstr "Service"
+
+msgid "Servicio del equipo aliado"
+msgstr "Allied team service"
+
+msgid "Servicio no disponible"
+msgstr "Service unavailable"
+
+msgid "Siguiente"
+msgstr "Next"
+
+msgid "Sin respuesta"
+msgstr "No response"
+
+#, python-format
+msgid "Solicitud #%(id)s (%(status)s)"
+msgstr "Request #%(id)s (%(status)s)"
+
+msgid "Supuestos"
+msgstr "Assumptions"
+
+msgid "Supuestos utilizados"
+msgstr "Assumptions used"
+
+msgid "Tarea asíncrona"
+msgstr "Asynchronous task"
+
+msgid "Todavía no hay actividad. Genera un plan para ver el primer evento."
+msgstr "There is no activity yet. Generate a plan to see the first event."
+
+msgid "Todo resultado generado por IA requiere revisión humana."
+msgstr "Every AI-generated result requires human review."
+
+msgid "Transparencia"
+msgstr "Transparency"
+
+msgid "Tu reporte se está generando en segundo plano."
+msgstr "Your report is being generated in the background."
+
+msgid "Un worker de Celery está preparando el archivo. Esta página se actualiza automáticamente cada 3 segundos."
+msgstr "A Celery worker is preparing the file. This page refreshes automatically every 3 seconds."
+
+#, python-format
+msgid "Valores en USD calculados con tasas de %(provider)s."
+msgstr "USD values calculated with rates from %(provider)s."
+
+msgid "Ver estado del sistema"
+msgstr "View system status"
+
+msgid "Ver estructura"
+msgstr "View structure"
+
+msgid "Ver historial"
+msgstr "View history"
+
+msgid "Ver plan"
+msgstr "View plan"
+
+msgid "Volver al inicio"
+msgstr "Back to home"
+
+msgid "Volver al plan"
+msgstr "Back to the plan"
+
+msgid "Ya existe una vacante con ese nombre en el departamento."
+msgstr "A vacancy with that name already exists in the department."
+
+msgid "convierte una idea de negocio en un primer plan de equipo."
+msgstr "turns a business idea into a first team plan."
+
+msgid "proveedor"
+msgstr "provider"
+
+msgid "puestos sugeridos"
+msgstr "suggested positions"
+
+msgid "tipos de vacante"
+msgstr "vacancy types"
+
+msgid "áreas"
+msgstr "areas"
+
