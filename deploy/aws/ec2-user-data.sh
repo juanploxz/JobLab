@@ -31,6 +31,9 @@ if [ ! -f /swapfile ]; then
     echo "/swapfile swap swap defaults 0 0" >> /etc/fstab
 fi
 
+# The checkout ends up owned by ec2-user; allow root (sudo deploy.sh) to run git in it.
+git config --system --add safe.directory "$APP_DIR"
+
 if [ ! -d "$APP_DIR/.git" ]; then
     git clone --branch "$BRANCH" "$REPO_URL" "$APP_DIR"
 fi

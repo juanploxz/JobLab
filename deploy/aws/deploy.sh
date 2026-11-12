@@ -5,6 +5,9 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 BRANCH="${1:-main}"
 
+# Avoid "dubious ownership" when root runs git in a checkout owned by ec2-user.
+git config --global --get-all safe.directory | grep -qx "$(pwd)" || git config --global --add safe.directory "$(pwd)"
+
 git fetch origin "$BRANCH"
 git checkout "$BRANCH"
 git pull --ff-only origin "$BRANCH"
