@@ -24,6 +24,7 @@ class Config:
     AI_PROVIDER = os.environ.get("AI_PROVIDER", "MOCK").strip().upper()
     GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
     GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite").strip()
+    GEMINI_TIMEOUT_MS = int(os.environ.get("GEMINI_TIMEOUT_MS", "60000"))
 
     CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "").strip()
 

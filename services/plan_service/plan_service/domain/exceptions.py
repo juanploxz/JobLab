@@ -10,6 +10,10 @@ class GenerationError(RuntimeError):
     """Safe application error raised when a generation request fails."""
 
 
+class GenerationUnavailableError(GenerationError):
+    """The AI provider failed (network, timeout, rejected request or invalid output)."""
+
+
 class ConfigurationError(RuntimeError):
     """Raised when infrastructure is selected with an invalid configuration."""
 
