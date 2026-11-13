@@ -53,6 +53,7 @@ services:
       AI_PROVIDER: ${AI_PROVIDER:-MOCK}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash-lite}
+      GEMINI_TIMEOUT_MS: ${GEMINI_TIMEOUT_MS:-60000}
       CELERY_BROKER_URL: redis://redis:6379/0
     depends_on:
       postgres:

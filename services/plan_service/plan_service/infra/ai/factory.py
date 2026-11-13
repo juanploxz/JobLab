@@ -21,5 +21,6 @@ class AIProviderFactory:
             return GoogleOrganizationProvider(
                 api_key=config.get("GEMINI_API_KEY", ""),
                 model=config.get("GEMINI_MODEL", "gemini-2.5-flash-lite"),
+                timeout_ms=int(config.get("GEMINI_TIMEOUT_MS", 60_000)),
             )
         raise ConfigurationError(f"AI_PROVIDER={selected!r} is not valid. Use MOCK or GOOGLE.")
