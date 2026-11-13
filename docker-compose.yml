@@ -140,6 +140,8 @@ services:
       PLAN_SERVICE_URL: http://plan-service:5000
       INTEGRATION_SERVICE_URL: http://integration-service:5000
       REPORT_SERVICE_URL: http://report-service:5000
+      # Must exceed GEMINI_TIMEOUT_MS (60 s) and stay below Nginx proxy_read_timeout (90 s).
+      SERVICE_TIMEOUT_SECONDS: ${SERVICE_TIMEOUT_SECONDS:-70}
       GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
     volumes:
       - static_files:/app/staticfiles
