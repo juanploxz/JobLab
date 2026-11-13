@@ -6,11 +6,15 @@ from google.genai import types
 
 from plan_service.domain.exceptions import ConfigurationError, GenerationUnavailableError
 from plan_service.infra.ai.factory import AIProviderFactory
-from plan_service.infra.ai.google_provider import GoogleOrganizationProvider, build_response_schema
+from plan_service.infra.ai.google_provider import (
+    SYSTEM_INSTRUCTION,
+    GoogleOrganizationProvider,
+    proposal_json_schema,
+)
 from plan_service.infra.ai.mock_provider import MockOrganizationProvider
 from tests.base import DESCRIPTION, PlanServiceTestCase
 
-FORBIDDEN_KEYS = {"$ref", "$defs", "$schema", "additionalProperties", "additional_properties", "title", "anyOf", "default"}
+FORBIDDEN_KEYS = {"$ref", "$defs", "$schema", "additionalProperties", "title"}
 
 
 def _walk_keys(node):
@@ -56,36 +60,32 @@ def factory_returning(**behaviour):
 VALID_JSON = MockOrganizationProvider().generate(DESCRIPTION).model_dump_json()
 
 
-class ResponseSchemaTests(unittest.TestCase):
-    def test_schema_has_no_constructs_rejected_by_gemini(self):
-        schema = build_response_schema()
+class PromptSchemaTests(unittest.TestCase):
+    def test_schema_is_self_contained_and_matches_the_parser_contract(self):
+        schema = proposal_json_schema()
 
         self.assertEqual(set(_walk_keys(schema)) & FORBIDDEN_KEYS, set())
-        self.assertEqual(schema["type"], "OBJECT")
         self.assertEqual(
             schema["required"], ["company_name", "company_summary", "departments", "vacancies"]
         )
-
-    def test_nested_definitions_are_inlined(self):
-        schema = build_response_schema()
         department = schema["properties"]["departments"]["items"]
         vacancy = schema["properties"]["vacancies"]["items"]
+        self.assertEqual(set(department["properties"]), {"code", "name", "description", "parent_code"})
+        self.assertEqual(
+            set(vacancy["properties"]),
+            {
+                "department_code", "name", "available_positions", "salary_min", "salary_max",
+                "currency", "salary_period", "description", "required_knowledge", "reports_to",
+            },
+        )
 
-        self.assertEqual(department["type"], "OBJECT")
-        self.assertTrue(department["properties"]["parent_code"]["nullable"])
-        self.assertEqual(vacancy["properties"]["salary_min"]["type"], "NUMBER")
-        self.assertEqual(vacancy["properties"]["currency"]["enum"], ["COP", "USD", "EUR", "MXN"])
-        self.assertEqual(vacancy["property_ordering"][0], "department_code")
+    def test_system_instruction_embeds_the_exact_schema(self):
+        marker = "Esquema JSON exacto que debe cumplir la respuesta:\n"
+        embedded = json.loads(SYSTEM_INSTRUCTION.split(marker, 1)[1])
 
-    def test_schema_is_accepted_by_the_sdk_model(self):
-        sdk_schema = types.Schema.model_validate(build_response_schema())
-
-        self.assertEqual(sdk_schema.type, types.Type.OBJECT)
-        self.assertIsNone(sdk_schema.ref)
-        self.assertIsNone(sdk_schema.defs)
-        self.assertIsNone(sdk_schema.additional_properties)
-        items = sdk_schema.properties["vacancies"].items
-        self.assertEqual(items.properties["available_positions"].type, types.Type.INTEGER)
+        self.assertEqual(embedded, proposal_json_schema())
+        self.assertIn('"currency"', SYSTEM_INSTRUCTION)
+        self.assertNotIn("salary_currency", SYSTEM_INSTRUCTION)
 
 
 class GoogleProviderTests(unittest.TestCase):
@@ -94,7 +94,7 @@ class GoogleProviderTests(unittest.TestCase):
             api_key="test-key", model="gemini-test", client_factory=factory_returning(**behaviour)
         )
 
-    def test_client_gets_60s_timeout_and_request_uses_structured_json(self):
+    def test_client_gets_60s_timeout_and_request_uses_json_mode_without_schema(self):
         proposal = self.provider(text=VALID_JSON).generate(DESCRIPTION)
 
         client = FakeClient.instances[0]
@@ -106,9 +106,31 @@ class GoogleProviderTests(unittest.TestCase):
         self.assertIn(DESCRIPTION, call["contents"])
         config = call["config"]
         self.assertEqual(config.response_mime_type, "application/json")
-        self.assertIsInstance(config.response_schema, types.Schema)
-        self.assertIsNone(config.response_schema.defs)
+        self.assertIsNone(config.response_schema)
+        self.assertIsNone(config.response_json_schema)
+        self.assertEqual(config.system_instruction, SYSTEM_INSTRUCTION)
         self.assertEqual(proposal.company_name, json.loads(VALID_JSON)["company_name"])
+
+    def test_json_mode_answer_with_numeric_salaries_and_nulls_is_parsed(self):
+        answer = json.loads(VALID_JSON)
+        for vacancy in answer["vacancies"]:
+            vacancy["salary_min"] = float(vacancy["salary_min"])
+            vacancy["salary_max"] = int(float(vacancy["salary_max"]))
+            vacancy["reports_to"] = None
+
+        proposal = self.provider(text=json.dumps(answer)).generate(DESCRIPTION)
+
+        self.assertEqual(len(proposal.vacancies), len(answer["vacancies"]))
+        self.assertIsNone(proposal.vacancies[0].reports_to)
+
+    def test_answer_with_wrong_field_names_is_rejected(self):
+        answer = json.loads(VALID_JSON)
+        answer["vacancies"][0]["salary_currency"] = answer["vacancies"][0].pop("currency")
+
+        with self.assertLogs("plan_service.infra.ai.google_provider", "ERROR") as logs:
+            with self.assertRaises(GenerationUnavailableError):
+                self.provider(text=json.dumps(answer)).generate(DESCRIPTION)
+        self.assertIn("salary_currency", logs.output[0])
 
     def test_sdk_error_is_logged_and_wrapped(self):
         provider = self.provider(error=RuntimeError("400 INVALID_ARGUMENT response_schema"))
